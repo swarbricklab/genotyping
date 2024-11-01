@@ -8,21 +8,22 @@
 # ------------------------------------------------------------------------------
 # ==================================
 
+import pandas as pd
+
 # ==================================
 # Generate CEL file input list full
 # ----------------------------------
 # ==================================
 rule generate_cel_file_list_all:
     input:
-        cel_files=get_cel_files_input_all
+        samplesheet=config['samples']
     output:
         cel_list=out_dir/"cel_list.txt"
     log:
-        logs/"genotyping/output.generate_cel_file_list.log"
+        logs/"cel_list.log"
     run:
-        import pandas as pd
-        df = pd.DataFrame(input.cel_files, columns=["cel_files"])
-        df.to_csv(output.cel_list, sep="\t", index=False)
+        df = pd.read_csv(input.samplesheet, dtype=str)
+        df['cel'].dropna().unique().to_csv(output.cel_list, index=False)
 
 # ==================================
 # Run affy power-tools on (axiom) SNP arrays

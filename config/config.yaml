@@ -1,1 +1,3 @@
 out_dir: results/genotyping
+
+samples: config/samples.csv

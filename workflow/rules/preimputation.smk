@@ -24,9 +24,9 @@ rule identify_bam_chr_encoding:
 # change chr24 to X
 rule vcf_change_chr24_to_X:
     input:
-        vcf=genotyping/"apt_format_result/combined.b37.vcf"
+        vcf=out_dir/"apt_format_result/combined.b37.vcf"
     output: 
-        vcf_chr24_X=genotyping/"preimputation/chr24_to_X_b37.vcf"
+        vcf_chr24_X=out_dir/"preimputation/chr24_to_X_b37.vcf"
     log:
         logs/"genotyping/preimputation/vcf_change_chr24_to_X.log"
     container:
@@ -40,9 +40,9 @@ rule vcf_change_chr24_to_X:
 
 rule vcf_remove_position:
     input:
-        vcf_chr24_X=genotyping/"preimputation/chr24_to_X_b37.vcf"
+        vcf_chr24_X=out_dir/"preimputation/chr24_to_X_b37.vcf"
     output: 
-        vcf_chr24_X_clean=genotyping/"preimputation/chr24_to_X_b37.clean.vcf"
+        vcf_chr24_X_clean=out_dir/"preimputation/chr24_to_X_b37.clean.vcf"
     log:
         logs/"genotyping/preimputation/vcf_remove_position.log"
     container:
@@ -59,10 +59,10 @@ rule vcf_remove_position:
 # and reheader the vcf file (according to order in the reference file)
 rule vcf_reheader:
     input:
-        vcf_chr24_X_clean=genotyping/"preimputation/chr24_to_X_b37.clean.vcf"
+        vcf_chr24_X_clean=out_dir/"preimputation/chr24_to_X_b37.clean.vcf"
     output: 
-        vcf_chr24_X_noheader=genotyping/"preimputation/chr24_to_X_b37.clean.noheader.vcf",
-        vcf_reheader=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.vcf"
+        vcf_chr24_X_noheader=out_dir/"preimputation/chr24_to_X_b37.clean.noheader.vcf",
+        vcf_reheader=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.vcf"
     params:
         # TODO: pull these references from config 
         FAI="resources/genomes/refdata-cellranger-GRCh38-3.0.0/fasta/genome.fa.fai"
@@ -86,9 +86,9 @@ rule vcf_reheader:
 # update sequence dict of the vcf 
 rule vcf_updated_dict:
     input:
-        vcf_reheader=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.vcf"
+        vcf_reheader=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.vcf"
     output: 
-        vcf_dict_updated=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.vcf"
+        vcf_dict_updated=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.vcf"
     params:
         # TODO: pull these references from config 
         dictionary="resources/genomes/hg38/hg38.dict"
@@ -106,10 +106,10 @@ rule vcf_updated_dict:
 
 rule vcf_chr_encoded:
     input:
-        vcf_dict_updated=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.vcf"
+        vcf_dict_updated=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.vcf"
     output: 
-        vcf_MT_replaced=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chrM.vcf",
-        vcf_chr_encoded=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.vcf"
+        vcf_MT_replaced=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chrM.vcf",
+        vcf_chr_encoded=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.vcf"
     log:
         logs/"genotyping/preimputation/vcf_chr_encoded.log"
     container:
@@ -134,9 +134,9 @@ rule vcf_chr_encoded:
 
 rule sort_vcf:
     input:
-        vcf_chr_encoded=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.vcf"        
+        vcf_chr_encoded=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.vcf"        
     output: 
-        vcf_sorted=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.vcf"
+        vcf_sorted=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.vcf"
     log:
         logs/"genotyping/preimputation/sort_vcf.log"
     container:
@@ -158,9 +158,9 @@ rule sort_vcf:
 
 rule vcf_remove_unknowns:
     input:
-        vcf_sorted=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.vcf"
+        vcf_sorted=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.vcf"
     output: 
-        vcf_removed_unknowns=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.removed_unknowns.vcf"
+        vcf_removed_unknowns=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.removed_unknowns.vcf"
     log:
         logs/"genotyping/preimputation/vcf_remove_unknowns.log"
     container:
@@ -177,9 +177,9 @@ rule vcf_remove_unknowns:
 rule generate_cel_genotype_sample_mappings_file:
     input:
         samples=config["samples"],
-        vcf=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.removed_unknowns.vcf"
+        vcf=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.removed_unknowns.vcf"
     output: 
-        genotype_sample_mappings=genotyping/"preimputation/cel_genotype_sample_mappings.txt"
+        genotype_sample_mappings=out_dir/"preimputation/cel_genotype_sample_mappings.txt"
     log:
         logs/"genotyping/preimputation/generate_cel_genotype_sample_mappings_file.log"
     conda:
@@ -191,10 +191,10 @@ rule generate_cel_genotype_sample_mappings_file:
 
 rule vcf_rename_cel_sample_ids:
     input:
-        vcf=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.removed_unknowns.vcf",
-        cel_sample_mappings=genotyping/"preimputation/cel_genotype_sample_mappings.txt"
+        vcf=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.removed_unknowns.vcf",
+        cel_sample_mappings=out_dir/"preimputation/cel_genotype_sample_mappings.txt"
     output: 
-        vcf_sample_ids_mapped=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.removed_unknowns.sample_ids_mapped.vcf"
+        vcf_sample_ids_mapped=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.removed_unknowns.sample_ids_mapped.vcf"
     log:
         logs/"genotyping/preimputation/vcf_rename_cel_sample_ids.log"
     container:
@@ -208,10 +208,10 @@ rule vcf_rename_cel_sample_ids:
 # NOTE: this is quite a strange output format. Can we optimise in some way?
 rule generate_sample_CEL_file_mappings_file:
     input:
-        vcf_sample_ids_mapped=genotyping/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.removed_unknowns.sample_ids_mapped.vcf"
+        vcf_sample_ids_mapped=out_dir/"preimputation/chr24_to_X_b37.clean.reheader.dict_updated.chr_encoded.sorted.removed_unknowns.sample_ids_mapped.vcf"
     output: 
         # TODO: rename this file as it's no longer CEL files that are generated here, so the filename is confusing (maybe something like: vcf_sample_header.txt)
-        sample_cel_file_mappings=genotyping/"preimputation/CEL_files.txt"
+        sample_cel_file_mappings=out_dir/"preimputation/CEL_files.txt"
     log:
         logs/"genotyping/preimputation/generate_sample_CEL_file_mappings_file.log"
     container:
@@ -230,9 +230,9 @@ rule generate_sample_CEL_file_mappings_file:
 # ================================== 
 rule metadata_psam:
     input:
-        CEL_file=genotyping/"preimputation/CEL_files.txt"
+        CEL_file=out_dir/"preimputation/CEL_files.txt"
     output: 
-        psam=genotyping/"metadata/metadata.psam"
+        psam=out_dir/"metadata/metadata.psam"
     log:
         logs/"genotyping/metadata/metadata_psam.log"
     container:

@@ -1,0 +1,6 @@
+include: "rules/common.smk"
+include: "rules/genotyping.smk"
+
+rule all:
+    input:
+        vcf_file=out_dir/"apt_format_result/combined.b37.vcf"

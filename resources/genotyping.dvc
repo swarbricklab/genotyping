@@ -1,0 +1,13 @@
+md5: 79dbed30625e870c3becc20537804e30
+frozen: true
+deps:
+- path: demuxafy/resources/genotyping
+  repo:
+    url: git@github.com:Swarbricklab/references.git
+    rev_lock: 49af0629d422e5181954062682e04417a3e2d4ad
+outs:
+- md5: 445ea0a76fad69561c49ebb0e3101ef6.dir
+  size: 7467007822
+  nfiles: 88
+  hash: md5
+  path: genotyping

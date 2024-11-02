@@ -1,0 +1,13 @@
+md5: 1aae600fb3a988af0db91156de834317
+frozen: true
+deps:
+- path: 
+    KAC9746_UKB_B12-D03_RESULTS/5504844441710070123426_UKB_C03_KAC9746A27_3840_Tumour.CEL
+  repo:
+    url: git@github.com:Swarbricklab/snp.git
+    rev_lock: 9d8888b638247894e0d2d09dfe73c58e63156b25
+outs:
+- md5: de40804637c02c332f0cc09867cab294
+  size: 28650780
+  hash: md5
+  path: SNP3840.CEL

@@ -1,0 +1,8 @@
+# Template config. Copy to 'config/genotyping/' and edit as appropriate
+
+# Output directory. All workflow output is below this directory
+out_dir: results/genotyping
+# Log directory. All workflow logs are below this directory
+log_dir: logs/genotyping
+# Sample sheet. See README for column specifications
+samples: config/samples.csv

@@ -1,0 +1,31 @@
+# Workflow profile
+
+# General settings
+verbose: False
+keep-going: True
+rerun-incomplete: True
+latency-wait: 30
+retries: 1
+
+# Resource settings per rule
+set-resources:
+  apt:
+    threads: 10
+    mem: "16GB"
+    runtime: 20
+  apt_format_result:
+    mem: "12GB"
+    runtime: 20
+  otv_caller:
+    threads: 20
+    mem: "4GB"
+    runtime: 60
+  ps_metrics:
+    threads: 10
+    mem: "8GB"
+    runtime: 5
+  ps_classification:
+    threads: 10
+    mem: "8GB"
+    runtime: 10
+  

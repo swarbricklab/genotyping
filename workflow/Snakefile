@@ -1,6 +1,176 @@
-include: "rules/common.smk"
-include: "rules/genotyping.smk"
+from pathlib import Path
+import pandas as pd
+import numpy as np
+
+# Global paths
+out_dir=Path(config['out_dir'])
+logs=Path(config['log_dir'])
+
+# Sample sheet
+samples = pd.read_csv(config["samples"], dtype=str)
 
 rule all:
     input:
         vcf_file=out_dir/"apt_format_result/combined.b37.vcf"
+
+# Generate list of all unique CEL files in the sample sheet
+rule generate_cel_file_list_all:
+    input:
+        samplesheet=config['samples']
+    output:
+        cel_list=out_dir/"cel_list.txt"
+    log:
+        logs/"cel_list.log"
+    run:
+        df = pd.read_csv(input.samplesheet, dtype=str)
+        cel_list=df['cel_files'].dropna().drop_duplicates()
+        cel_list.to_frame().to_csv(output.cel_list, index=False)
+
+# Run affy power-tools on (axiom) SNP arrays
+rule apt:
+    input:
+        cel_list=out_dir/"cel_list.txt"
+    output:
+        axiom_calls=out_dir/"apt/AxiomGT1.calls.txt",
+        axiom_confidences=out_dir/"apt/AxiomGT1.confidences.txt",
+        axiom_report=out_dir/"apt/AxiomGT1.report.txt",
+        axiom_snp_posteriors=out_dir/"apt/AxiomGT1.snp-posteriors.txt",
+        axiom_summary=out_dir/"apt/AxiomGT1.summary.a5",
+        axion_chp_bin=out_dir/"apt/AxiomAnalysisSuiteData/All_genotypes_by_snps.CHP.bin",
+        axion_chp_index=out_dir/"apt/AxiomAnalysisSuiteData/All_genotypes_by_snps.CHP.index.txt"
+    params:
+        arg_file="resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml",
+        dir_annotation="resources/genotyping/annotation/"
+    log:
+        console=logs/"apt/output.apt.log",
+        axiom=logs/"apt/apt-genotype-axiom.log"
+    container: 
+        "docker://swarbricklab/ctp-tools:apt-2.10.2"
+    shell:
+        # NOTE: for now I'm assuming the SNP file format is UKB
+        #       - TODO: make more generic to process the PMDA array type
+        """
+        output_dir=$(dirname {output.axiom_calls})
+        apt-genotype-axiom \
+            --cel-files {input.cel_list} \
+            --batch-folder $output_dir \
+            --out-dir $output_dir \
+            --arg-file {params.arg_file} \
+            --analysis-files-path {params.dir_annotation} \
+            --dual-channel-normalization true \
+            --summaries --write-models \
+            --console-add-neg-select WARNING,summary,debug \
+            --log-file {log.axiom} \
+            > {log.console} 2>&1
+        """
+
+# Run SNPolisher ps-metrics
+rule ps_metrics:
+    input:
+        axiom_snp_posteriors=out_dir/"apt/AxiomGT1.snp-posteriors.txt",
+        axiom_calls=out_dir/"apt/AxiomGT1.calls.txt"
+    output:
+        metrics=out_dir/"ps_metrics/metrics.txt"
+    log:
+        ps=logs/"ps_metrics/ps_metrics.log",
+        console=logs/"ps_metrics/console.log"
+    container: 
+        "docker://swarbricklab/ctp-tools:apt-2.10.2"
+    shell:
+        """
+        ps-metrics --posterior-file {input.axiom_snp_posteriors} \
+            --call-file {input.axiom_calls} \
+            --metrics-file {output.metrics} \
+            --log-file {log.ps} \
+            --console-add-neg-select WARNING,summary,debug \
+            > {log.console} 2>&1
+        """
+
+# Run SNPolisher ps-classification
+rule ps_classification:
+    input:
+        metrics=out_dir/"ps_metrics/metrics.txt"
+    output:
+        recommended=out_dir/"ps_classification/Recommended.ps",
+        call_rate=out_dir/"ps_classification/CallRateBelowThreshold.ps",
+        hemizygous=out_dir/"ps_classification/Hemizygous.ps",
+        mono_high=out_dir/"ps_classification/MonoHighResolution.ps",
+        no_minor_hom=out_dir/"ps_classification/NoMinorHom.ps",
+        off_target=out_dir/"ps_classification/OffTargetVariant.ps",
+        other=out_dir/"ps_classification/Other.ps",
+        poly_high=out_dir/"ps_classification/PolyHighResolution.ps",
+        ps_performance=out_dir/"ps_classification/Ps.performance.txt"
+    params:
+        ps2snp_file="resources/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps",
+        dir_output=out_dir/"ps_classification/"
+    log:
+        ps=logs/"ps_classification/ps_classification.log",
+        console=logs/"ps_classification/console.log"
+    container: 
+        "docker://swarbricklab/ctp-tools:apt-2.10.2"
+    shell:
+        """
+        output_dir=$(dirname {output.recommended})
+        ps-classification --species-type human \
+            --metrics-file {input.metrics} \
+            --output-dir $output_dir \
+            --ps2snp-file {params.ps2snp_file} \
+            --log-file {log.ps} \
+            --console-add-neg-select WARNING,summary,debug \
+            > {log.console} 2>&1
+        """
+
+# Run SNPolisher otv-caller
+rule otv_caller:
+    input:
+        rules.apt.output,
+        recommended=out_dir/"ps_classification/Recommended.ps"
+    output:
+        otv_output=expand(
+            out_dir/"otv_caller/{otv_files}", 
+            otv_files=["OTV.BIC.txt", "OTV.calls.txt", "OTV.confidences.txt", "OTV.keep.ps", "OTV.remove.ps", "OTV.snp-posteriors.txt", "OTV.summary.txt"]
+        )
+    params:
+        dir_batch=out_dir/"apt/",
+        dir_output=out_dir/"otv_caller/"
+    log:
+        otv=logs/"genotyping/otv_caller/otv_caller.log",
+        console=logs/"genotyping/otv_caller/console.log"
+    container: 
+        "docker://swarbricklab/ctp-tools:apt-2.10.2"
+    shell:
+        """
+        otv-caller --pid-file {input.recommended} \
+            --batch-folder {params.dir_batch} \
+            --output-dir {params.dir_output} \
+            --log-file {log.otv} \
+            --console-add-neg-select WARNING,summary,debug \
+            > {log.console} 2>&1
+        """
+
+# Run ("runPolisher") apt-format-result
+rule apt_format_result:
+    input:
+        otv_keep=out_dir/"otv_caller/OTV.keep.ps"
+    output:
+        vcf_file=out_dir/"apt_format_result/combined.b37.vcf"
+    params:
+        annotation="resources/annotation/Axiom_UKB_WCSG.na35.annot.db",
+        batch_folder_data_dir="../apt/AxiomAnalysisSuiteData/"
+    log:
+        apt=logs/"genotyping/apt_format_result/apt_format_result.log",
+        console=logs/"genotyping/apt_format_result/console.log"
+    container: 
+        "docker://swarbricklab/ctp-tools:apt-2.10.2"
+    shell:
+        """
+        batch_folder=$(dirname {input.otv_keep})
+        apt-format-result --batch-folder $batch_folder \
+            --batch-folder-data-dir {params.batch_folder_data_dir} \
+            --snp-list-file {input.otv_keep} \
+            --annotation-file {params.annotation} \
+            --export-vcf-file {output.vcf_file} \
+            --log-file {log} \
+            --console-add-neg-select WARNING,summary,debug \
+            > {log.console} 2>&1
+        """

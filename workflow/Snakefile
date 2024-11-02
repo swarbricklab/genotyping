@@ -6,19 +6,30 @@ import numpy as np
 out_dir=Path(config['out_dir'])
 logs=Path(config['log_dir'])
 
-# Sample sheet
-samples = pd.read_csv(config["samples"], dtype=str)
-
 rule all:
     input:
-        vcf_file=out_dir/"apt_format_result/combined.b37.vcf"
+        vcf_file=out_dir/"combined.vcf"
+
+rule create_sample_mapping:
+    input:
+        samplesheet=config['samples']
+    output:
+        mapping=temp(out_dir/"samples.txt")
+    run:
+        # Read the CSV file into a DataFrame
+        samples_df = pd.read_csv(input.samplesheet)
+        # Extract just the filename (without path) from 'cel_files' column
+        samples_df['cel_file_name'] = samples_df['cel_files'].apply(lambda x: Path(x).name)
+        # Create a new DataFrame with only 'cel_file_name' and 'sample' columns for the mapping
+        samples_df[['cel_file_name', 'sample']].to_csv(output.mapping, sep='\t', header=False, index=False)
+
 
 # Generate list of all unique CEL files in the sample sheet
 rule generate_cel_file_list_all:
     input:
         samplesheet=config['samples']
     output:
-        cel_list=out_dir/"cel_list.txt"
+        cel_list=temp(out_dir/"cel_list.txt")
     log:
         logs/"cel_list.log"
     run:
@@ -31,13 +42,8 @@ rule apt:
     input:
         cel_list=out_dir/"cel_list.txt"
     output:
-        axiom_calls=out_dir/"apt/AxiomGT1.calls.txt",
-        axiom_confidences=out_dir/"apt/AxiomGT1.confidences.txt",
-        axiom_report=out_dir/"apt/AxiomGT1.report.txt",
-        axiom_snp_posteriors=out_dir/"apt/AxiomGT1.snp-posteriors.txt",
-        axiom_summary=out_dir/"apt/AxiomGT1.summary.a5",
-        axion_chp_bin=out_dir/"apt/AxiomAnalysisSuiteData/All_genotypes_by_snps.CHP.bin",
-        axion_chp_index=out_dir/"apt/AxiomAnalysisSuiteData/All_genotypes_by_snps.CHP.index.txt"
+        axiom_calls=temp(out_dir/"apt/AxiomGT1.calls.txt"),
+        axiom_snp_posteriors=temp(out_dir/"apt/AxiomGT1.snp-posteriors.txt")
     params:
         arg_file="resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml",
         dir_annotation="resources/genotyping/annotation/"
@@ -70,7 +76,7 @@ rule ps_metrics:
         axiom_snp_posteriors=out_dir/"apt/AxiomGT1.snp-posteriors.txt",
         axiom_calls=out_dir/"apt/AxiomGT1.calls.txt"
     output:
-        metrics=out_dir/"ps_metrics/metrics.txt"
+        metrics=temp(out_dir/"ps_metrics/metrics.txt")
     log:
         ps=logs/"ps_metrics/ps_metrics.log",
         console=logs/"ps_metrics/console.log"
@@ -91,17 +97,9 @@ rule ps_classification:
     input:
         metrics=out_dir/"ps_metrics/metrics.txt"
     output:
-        recommended=out_dir/"ps_classification/Recommended.ps",
-        call_rate=out_dir/"ps_classification/CallRateBelowThreshold.ps",
-        hemizygous=out_dir/"ps_classification/Hemizygous.ps",
-        mono_high=out_dir/"ps_classification/MonoHighResolution.ps",
-        no_minor_hom=out_dir/"ps_classification/NoMinorHom.ps",
-        off_target=out_dir/"ps_classification/OffTargetVariant.ps",
-        other=out_dir/"ps_classification/Other.ps",
-        poly_high=out_dir/"ps_classification/PolyHighResolution.ps",
-        ps_performance=out_dir/"ps_classification/Ps.performance.txt"
+        recommended=temp(out_dir/"ps_classification/Recommended.ps")
     params:
-        ps2snp_file="resources/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps",
+        ps2snp_file="resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps",
         dir_output=out_dir/"ps_classification/"
     log:
         ps=logs/"ps_classification/ps_classification.log",
@@ -124,18 +122,15 @@ rule ps_classification:
 rule otv_caller:
     input:
         rules.apt.output,
-        recommended=out_dir/"ps_classification/Recommended.ps"
+        recommended=temp(out_dir/"ps_classification/Recommended.ps")
     output:
-        otv_output=expand(
-            out_dir/"otv_caller/{otv_files}", 
-            otv_files=["OTV.BIC.txt", "OTV.calls.txt", "OTV.confidences.txt", "OTV.keep.ps", "OTV.remove.ps", "OTV.snp-posteriors.txt", "OTV.summary.txt"]
-        )
+        keep=temp(out_dir/"otv_caller/OTV.keep.ps")
     params:
         dir_batch=out_dir/"apt/",
         dir_output=out_dir/"otv_caller/"
     log:
-        otv=logs/"genotyping/otv_caller/otv_caller.log",
-        console=logs/"genotyping/otv_caller/console.log"
+        otv=logs/"otv_caller/otv_caller.log",
+        console=logs/"otv_caller/console.log"
     container: 
         "docker://swarbricklab/ctp-tools:apt-2.10.2"
     shell:
@@ -153,13 +148,13 @@ rule apt_format_result:
     input:
         otv_keep=out_dir/"otv_caller/OTV.keep.ps"
     output:
-        vcf_file=out_dir/"apt_format_result/combined.b37.vcf"
+        vcf_file=temp(out_dir/"apt_format_result/combined.b37.vcf")
     params:
-        annotation="resources/annotation/Axiom_UKB_WCSG.na35.annot.db",
+        annotation="resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db",
         batch_folder_data_dir="../apt/AxiomAnalysisSuiteData/"
     log:
-        apt=logs/"genotyping/apt_format_result/apt_format_result.log",
-        console=logs/"genotyping/apt_format_result/console.log"
+        apt=logs/"apt_format_result/apt_format_result.log",
+        console=logs/"apt_format_result/console.log"
     container: 
         "docker://swarbricklab/ctp-tools:apt-2.10.2"
     shell:
@@ -170,7 +165,24 @@ rule apt_format_result:
             --snp-list-file {input.otv_keep} \
             --annotation-file {params.annotation} \
             --export-vcf-file {output.vcf_file} \
-            --log-file {log} \
+            --log-file {log.apt} \
             --console-add-neg-select WARNING,summary,debug \
             > {log.console} 2>&1
         """
+
+# Replace CEL file names by sample names
+rule reheader:
+    input:
+        vcf=out_dir/"apt_format_result/combined.b37.vcf",
+        samples=out_dir/"samples.txt"
+    output:
+        vcf=out_dir/"combined.vcf"
+    log:
+        logs/"reheader.log"
+    container:
+        "docker://staphb/bcftools:1.21"
+    shell:
+        """
+        bcftools reheader -s {input.samples} -o {output.vcf} {input.vcf}
+        """
+    

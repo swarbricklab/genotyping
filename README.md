@@ -17,5 +17,6 @@ This workflow uses the [Analysis Power Tools](https://www.thermofisher.com/au/en
 Annotation of the VCF file is based on [this annotation reference](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153), also by ThermoFisher Scientific.
 
 The workflow, defined by the [Snakefile](workflow/Snakefile) runs as shown by the following rule graph:
+
 ![Rulegraph](docs/rulegraph.svg)
 

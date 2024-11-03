@@ -122,7 +122,7 @@ rule ps_classification:
 rule otv_caller:
     input:
         rules.apt.output,
-        recommended=temp(out_dir/"ps_classification/Recommended.ps")
+        recommended=out_dir/"ps_classification/Recommended.ps"
     output:
         keep=temp(out_dir/"otv_caller/OTV.keep.ps")
     params:

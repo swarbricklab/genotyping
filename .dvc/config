@@ -1,0 +1,4 @@
+[core]
+    remote = gadi
+['remote "gadi"']
+    url = ssh://gadi-dm.nci.org.au/g/data/a56/dvc/workflows/genotyping

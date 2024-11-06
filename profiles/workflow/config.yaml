@@ -13,17 +13,25 @@ retries: 0
 
 # Resource settings per rule
 set-resources:
+  map_samples:
+    threads: 1
+    mem: "4GB"
+    runtime: 1
+  list_cel_files:
+    threads: 1
+    mem: "4GB"
+    runtime: 1
   apt:
     threads: 10
     mem: "16GB"
     runtime: 20
-  apt_format_result:
+  make_vcf:
     mem: "12GB"
     runtime: 20
   otv_caller:
     threads: 20
     mem: "4GB"
-    runtime: 60
+    runtime: 30
   ps_metrics:
     threads: 10
     mem: "8GB"
@@ -32,4 +40,19 @@ set-resources:
     threads: 10
     mem: "8GB"
     runtime: 10
-  
+  format_vcf:
+    threads: 1
+    mem: "8GB"
+    runtime: 20
+  sort_vcf:
+    threads: 1
+    mem: "8GB"
+    runtime: 20
+  index_vcf:
+    threads: 1
+    mem: "8GB"
+    runtime: 10
+  liftover:
+    threads: 1
+    mem: "8GB"
+    runtime: 20

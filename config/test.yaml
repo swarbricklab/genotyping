@@ -6,3 +6,5 @@ out_dir: test/results
 log_dir: logs/genotyping
 # Sample sheet. See README for column specifications
 samples: config/samples.csv
+# Name of the final VCF file
+final_vcf: combined.hg38.vcf

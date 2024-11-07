@@ -5,6 +5,7 @@ import numpy as np
 # Global paths
 out_dir=Path(config['out_dir'])
 logs=Path(config['log_dir'])
+final_vcf=out_dir/config['final_vcf']
 
 include: "rules/prep.smk"
 include: "rules/apt.smk"
@@ -12,6 +13,6 @@ include: "rules/bcftools.smk"
 
 rule all:
     input:
-        vcf_file=out_dir/"combined.hg38.vcf"
+        final_vcf
 
 

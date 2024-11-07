@@ -34,7 +34,7 @@ rule liftover:
         src_fa="resources/genomes/hg19/hg19.fa",
         target_fa="resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa"
     output:
-        vcf_hg38=out_dir/"combined.hg38.vcf"
+        vcf_hg38=final_vcf
     container:
         "docker://yangyxt/bcftools_liftover:1.18"
     log:

@@ -5,16 +5,18 @@ This VCF file can be used for demultiplexing 10X scRNA-seq data where multiple s
 
 ## Authors
 
-This workflow was originally developed by @nbartonicek as a collection of bash and SGE scripts.
-These scripts were then refactored as part of the Swarbrick Lab [souporcell workflow](https://git.gimr.garvan.org.au/CTP/soup-or-cell) (VPN required) by @dlroden, as an extension of the [original souporcell workflow](https://github.com/wheaton5/souporcell) by @wheaton5 et al.
-Parts of the Swarbrick Lab souporcell workflow were then transferred to the Swarbrick Lab [demuxafy workflow](https://github.com/swarbricklab/demuxafy) by @dlroden and @BeataKiedik, as an extension of the [original demuxafy workflow](https://github.com/drneavin/Demultiplexing_Doublet_Detecting_Docs) by @drneavin.
+This workflow was originally developed by [@nbartonicek](https://github.com/nbartonicek) as a collection of bash and SGE scripts.
+These scripts were then refactored as part of the Swarbrick Lab [souporcell workflow](https://git.gimr.garvan.org.au/CTP/soup-or-cell) (VPN required) by [@dlroden](https://github.com/dlroden), as an extension of the [original souporcell workflow](https://github.com/wheaton5/souporcell) by [@wheaton5](https://github.com/wheaton5) et al.
+Parts of the Swarbrick Lab souporcell workflow were then transferred to the Swarbrick Lab [demuxafy workflow](https://github.com/swarbricklab/demuxafy) by [@dlroden](https://github.com/dlroden) and [@BeataKiedik](https://github.com/BeataKiedik), as an extension of the [original demuxafy workflow](https://github.com/drneavin/Demultiplexing_Doublet_Detecting_Docs) by [@drneavin](https://github.com/drneavin).
 Finally, the genotyping steps in the Swarbrick Lab demuxafy workflow were extracted and refactored as a standalone workflow (this repo) by @johnyaku.
 
 ## Overview
 
 SNP microarray data is stored in `.CEL` files, with one `.CEL` file per sample, as defined in a sample sheet.
 This workflow uses the [Analysis Power Tools](https://www.thermofisher.com/au/en/home/life-science/microarray-analysis/microarray-analysis-partners-programs/affymetrix-developers-network/affymetrix-power-tools.html) (APT) by ThermoFisher Scientific to convert these `.CEL` files into a single VCF file containing high-confidence variant calls for all samples.
-Annotation of the VCF file is based on [this annotation reference](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153), also by ThermoFisher Scientific.
+Annotation of the VCF file is based on [this annotation reference](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153) (also by ThermoFisher Scientific), which in turn is based on the `hg19` assembly of the human genome. 
+This worklow formats the VCF file by adding header contigs for `hg19` and reformatting the chomosome names from 1, 2, 3, ... to chr1, chr2, chr3, ...
+Finally, the formatted `hg19` VCF file is lifted over to the `hg38` assembly.
 
 The workflow, defined by the [Snakefile](workflow/Snakefile) runs as shown by the following rule graph:
 
@@ -27,7 +29,7 @@ Further reading: [Axiom Genotyping Solution Data Analysis User Guide](https://as
 ## Configuration
 
 Configuring the workflow involves editing two files:
-- config file` (see [this template](config/template.yaml) for an example)
+- config file (see [this template](config/template.yaml) for an example)
 - sample sheet (see [this example](config/samples.csv) used for testing)
 
 ### Config file

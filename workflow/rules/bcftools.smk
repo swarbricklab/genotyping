@@ -1,5 +1,8 @@
 # Replace CEL file names by sample names
 rule format_vcf:
+    """
+    Formats the generated VCF by removing unknown positions, reheadering, renaming chromosomes, and sorting it.
+    """
     input:
         vcf=out_dir/"make_vcf/combined.b37.vcf",
         samples=out_dir/"sample_map.txt",
@@ -22,6 +25,9 @@ rule format_vcf:
         """
     
 rule liftover:
+    """
+    Lifts over the VCF file from the hg19 reference genome to the hg38 reference genome using a chain file.
+    """
     input:
         vcf_b37=out_dir/"combined.b37.vcf",
         chain="resources/liftover/hg19ToHg38.over.chain",

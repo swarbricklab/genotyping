@@ -1,4 +1,7 @@
 rule map_samples:
+    """
+    Creates a mapping file that maps CEL file names to sample names, extracted from the given sample sheet.
+    """
     input:
         samplesheet=config['samples']
     output:
@@ -14,6 +17,9 @@ rule map_samples:
 
 # Generate list of all unique CEL files in the sample sheet
 rule list_cel_files:
+    """
+    Creates a list of all unique CEL files by reading the sample sheet and removing duplicates.
+    """
     input:
         samplesheet=config['samples']
     output:
@@ -26,6 +32,9 @@ rule list_cel_files:
         cel_list.to_frame().to_csv(output.cel_list, index=False)
 
 rule prepare_hg19:
+    """
+    Prepares the hg19 reference genome by decompressing the FASTA file, indexing it, and generating intermediate files for VCF reformatting and liftover.
+    """
     input:
         gz="resources/genomes/hg19/hg19.fa.gz"
     output:
@@ -57,6 +66,9 @@ rule prepare_hg19:
         """
 
 rule prepare_chain:
+    """
+    Decompresses the liftover chain file for use in the liftover process.
+    """
     input:
         gz="resources/liftover/hg19ToHg38.over.chain.gz"
     output:

@@ -1,5 +1,8 @@
 # Run affy power-tools on (axiom) SNP arrays
 rule apt:
+    """
+    Runs Affymetrix Power Tools (APT) to perform genotyping on SNP arrays using the provided CEL files and annotation.
+    """
     input:
         cel_list=out_dir/"cel_list.txt",
         arg_file="resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml",
@@ -33,6 +36,9 @@ rule apt:
 
 # Run SNPolisher ps-metrics
 rule ps_metrics:
+    """
+    Runs SNPolisher to generate performance metrics for SNPs using posterior and call files.
+    """
     input:
         axiom_snp_posteriors=out_dir/"apt/AxiomGT1.snp-posteriors.txt",
         axiom_calls=out_dir/"apt/AxiomGT1.calls.txt"
@@ -55,6 +61,9 @@ rule ps_metrics:
 
 # Run SNPolisher ps-classification
 rule ps_classification:
+    """
+    Runs SNPolisher to classify SNPs using performance metrics and an annotation file.
+    """
     input:
         metrics=out_dir/"ps_metrics/metrics.txt",
         ps2snp_file="resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps"
@@ -79,6 +88,9 @@ rule ps_classification:
 
 # Run SNPolisher otv-caller
 rule otv_caller:
+    """
+    Runs SNPolisher to call Off-Target Variants (OTVs) using the recommended SNPs and output from APT.
+    """
     input:
         rules.apt.output,
         recommended=out_dir/"ps_classification/Recommended.ps",
@@ -102,8 +114,10 @@ rule otv_caller:
             > {log.console} 2>&1
         """
 
-# Run ("runPolisher") apt-format-result
 rule make_vcf:
+    """
+    Runs apt-format-result to generate a VCF file from the APT outputs using the SNP annotation file.
+    """
     input:
         otv_keep=out_dir/"otv_caller/OTV.keep.ps",
         otv_dir=out_dir/"otv_caller/",

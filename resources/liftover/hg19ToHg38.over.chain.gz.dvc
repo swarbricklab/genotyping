@@ -1,0 +1,12 @@
+md5: 9bcfe52ef822e66514c9c3268642817c
+frozen: true
+deps:
+- checksum: '"37972-4eee3590f3b80"'
+  size: 227698
+  hash: md5
+  path: https://hgdownload.soe.ucsc.edu/gbdb/hg19/liftOver/hg19ToHg38.over.chain.gz
+outs:
+- md5: 35887f73fe5e2231656504d1f6430900
+  size: 227698
+  hash: md5
+  path: hg19ToHg38.over.chain.gz

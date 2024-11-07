@@ -1,0 +1,12 @@
+md5: 0191f72690ca44a25b6a3c33af500476
+frozen: true
+deps:
+- checksum: '"3a5cdd9f-59c5d0a860480"'
+  size: 979164575
+  hash: md5
+  path: https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/latest/hg19.fa.gz
+outs:
+- md5: 7707462fc100c7d987c075bc146b16ae
+  size: 979164575
+  hash: md5
+  path: hg19.fa.gz

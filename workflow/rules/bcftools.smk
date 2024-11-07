@@ -4,8 +4,7 @@ rule format_vcf:
         vcf=out_dir/"make_vcf/combined.b37.vcf",
         samples=out_dir/"sample_map.txt"
     output:
-        bcf=temp(out_dir/"combined.b37.bcf"),
-        csi=temp(out_dir/"combined.b37.bcf.csi")
+        vcf=out_dir/"combined.b37.vcf"
     params:
         int_fai_hg19="resources/genomes/hg19/hg19_int.fa.fai",
         chr_map="resources/chr_map.tsv"
@@ -19,16 +18,15 @@ rule format_vcf:
             | bcftools reheader --fai {params.int_fai_hg19} \
             | bcftools annotate --rename-chrs {params.chr_map} \
             | bcftools reheader -s {input.samples} \
-            | bcftools sort \
-            | bcftools view -O b -o {output.bcf} && \
-            bcftools index {output.bcf}
+            | bcftools sort -o {output.vcf} \
+            2> {log}
         """
     
 rule liftover:
     input:
-        bcf_b37=out_dir/"combined.b37.bcf"
+        vcf_b37=out_dir/"combined.b37.vcf"
     output:
-        bcf_hg38=out_dir/"combined.hg38.bcf"
+        vcf_hg38=out_dir/"combined.hg38.vcf"
     params:
         chain="resources/genotyping/liftover/hg19ToHg38.over.chain",
         src_fa="resources/genomes/hg19/hg19.fa",
@@ -39,10 +37,10 @@ rule liftover:
         logs/"liftover.log"
     shell:
         """
-        bcftools +liftover {input.bcf_b37} \
-            --output {output.bcf_hg38} -- \
+        bcftools +liftover {input.vcf_b37} \
+            --output {output.vcf_hg38} -- \
             --chain {params.chain} \
             --src-fasta-ref {params.src_fa} \
             --fasta-ref {params.target_fa} 2> {log}
-        bcftools sort {output.bcf_hg38} 2>> {log}
+        bcftools sort {output.vcf_hg38} 2>> {log}
         """

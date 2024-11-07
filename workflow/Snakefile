@@ -12,6 +12,6 @@ include: "rules/bcftools.smk"
 
 rule all:
     input:
-        vcf_file=out_dir/"combined.hg38.bcf"
+        vcf_file=out_dir/"combined.hg38.vcf"
 
 

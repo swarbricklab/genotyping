@@ -24,3 +24,44 @@ rule list_cel_files:
         df = pd.read_csv(input.samplesheet, dtype=str)
         cel_list=df['cel_files'].dropna().drop_duplicates()
         cel_list.to_frame().to_csv(output.cel_list, index=False)
+
+rule prepare_hg19:
+    input:
+        gz="resources/genomes/hg19/hg19.fa.gz"
+    output:
+        fa=temp("resources/genomes/hg19/hg19.fa"),
+        fai=temp("resources/genomes/hg19/hg19.fa.fai"),
+        int_fai=temp("resources/genomes/hg19/hg19_int.fa.fai"),
+        chr_map=temp("resources/genomes/hg19/map_int2chr.tsv")
+    container:
+         "docker://quay.io/biocontainers/samtools:1.21--h50ea8bc_0"
+    log:
+        logs/"prepare_hg19.log"
+    shell:
+        """
+        gunzip -c {input.gz} > {output.fa}
+        samtools faidx {output.fa}
+        cat {output.fai} \
+            | sed '/_/d' \
+            | sed '/M/d' \
+            | sed 's/^chr//g' \
+            | sed 's/Y/23/g' \
+            | sed 's/X/24/g' \
+            | sort -n \
+            > {output.int_fai}
+        cat {output.int_fai} \
+            | awk -F'\t' '{{print $1 "\tchr" $1}}' \
+            | sed 's/chr23/chrY/g' \
+            | sed 's/chr24/chrX/g' \
+            > {output.chr_map}
+        """
+
+rule prepare_chain:
+    input:
+        gz="resources/liftover/hg19ToHg38.over.chain.gz"
+    output:
+        chain=temp("resources/liftover/hg19ToHg38.over.chain")
+    shell:
+        """
+        gunzip -c {input.gz} > {output.chain}
+        """

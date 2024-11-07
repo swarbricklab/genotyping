@@ -1,1 +1,5 @@
 /hg19.fa.gz
+/hg19.fa
+/hg19.fa.fai
+/hg19_int.fa.fai
+/map_int2chr.tsv

@@ -1,7 +1,7 @@
 # This config file is used for running the workflow on the test dataset
 
 # Output directory. All workflow output is below this directory
-out_dir: test/results/genotyping
+out_dir: test/results
 # Log directory. All workflow logs are below this directory
 log_dir: logs/genotyping
 # Sample sheet. See README for column specifications

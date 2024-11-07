@@ -2,12 +2,11 @@
 rule format_vcf:
     input:
         vcf=out_dir/"make_vcf/combined.b37.vcf",
-        samples=out_dir/"sample_map.txt"
+        samples=out_dir/"sample_map.txt",
+        chr_map="resources/genomes/hg19/map_int2chr.tsv",
+        int_fai_hg19="resources/genomes/hg19/hg19_int.fa.fai"
     output:
         vcf=out_dir/"combined.b37.vcf"
-    params:
-        int_fai_hg19="resources/genomes/hg19/hg19_int.fa.fai",
-        chr_map="resources/chr_map.tsv"
     log:
         logs/"format_vcf.log"
     container:
@@ -15,8 +14,8 @@ rule format_vcf:
     shell:
         """
         grep -v UNKNOWNPOSITION {input.vcf} \
-            | bcftools reheader --fai {params.int_fai_hg19} \
-            | bcftools annotate --rename-chrs {params.chr_map} \
+            | bcftools reheader --fai {input.int_fai_hg19} \
+            | bcftools annotate --rename-chrs {input.chr_map} \
             | bcftools reheader -s {input.samples} \
             | bcftools sort -o {output.vcf} \
             2> {log}
@@ -24,13 +23,12 @@ rule format_vcf:
     
 rule liftover:
     input:
-        vcf_b37=out_dir/"combined.b37.vcf"
-    output:
-        vcf_hg38=out_dir/"combined.hg38.vcf"
-    params:
-        chain="resources/genotyping/liftover/hg19ToHg38.over.chain",
+        vcf_b37=out_dir/"combined.b37.vcf",
+        chain="resources/liftover/hg19ToHg38.over.chain",
         src_fa="resources/genomes/hg19/hg19.fa",
         target_fa="resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa"
+    output:
+        vcf_hg38=out_dir/"combined.hg38.vcf"
     container:
         "docker://yangyxt/bcftools_liftover:1.18"
     log:
@@ -39,8 +37,8 @@ rule liftover:
         """
         bcftools +liftover {input.vcf_b37} \
             --output {output.vcf_hg38} -- \
-            --chain {params.chain} \
-            --src-fasta-ref {params.src_fa} \
-            --fasta-ref {params.target_fa} 2> {log}
+            --chain {input.chain} \
+            --src-fasta-ref {input.src_fa} \
+            --fasta-ref {input.target_fa} 2> {log}
         bcftools sort {output.vcf_hg38} 2>> {log}
         """

@@ -3,7 +3,7 @@ rule map_samples:
     Creates a mapping file that maps CEL file names to sample names, extracted from the given sample sheet.
     """
     input:
-        samplesheet=config['samples']
+        samplesheet=config['deps']['samples']
     output:
         mapping=temp(out_dir/"sample_map.txt")
     run:
@@ -21,7 +21,7 @@ rule list_cel_files:
     Creates a list of all unique CEL files by reading the sample sheet and removing duplicates.
     """
     input:
-        samplesheet=config['samples']
+        samplesheet=config['deps']['samples']
     output:
         cel_list=temp(out_dir/"cel_list.txt")
     log:
@@ -36,12 +36,12 @@ rule prepare_hg19:
     Prepares the hg19 reference genome by decompressing the FASTA file, indexing it, and generating intermediate files for VCF reformatting and liftover.
     """
     input:
-        gz="resources/genomes/hg19/hg19.fa.gz"
+        gz=config['deps']['genomes']['src']
     output:
-        fa=temp("resources/genomes/hg19/hg19.fa"),
-        fai=temp("resources/genomes/hg19/hg19.fa.fai"),
-        int_fai=temp("resources/genomes/hg19/hg19_int.fa.fai"),
-        chr_map=temp("resources/genomes/hg19/map_int2chr.tsv")
+        fa=temp(out_dir/"genomes/hg19.fa"),
+        fai=temp(out_dir/"genomes/hg19.fa.fai"),
+        int_fai=temp(out_dir/"genomes/hg19_int.fa.fai"),
+        chr_map=temp(out_dir/"genomes/map_int2chr.tsv")
     container:
          "docker://quay.io/biocontainers/samtools:1.21--h50ea8bc_0"
     log:
@@ -70,9 +70,9 @@ rule prepare_chain:
     Decompresses the liftover chain file for use in the liftover process.
     """
     input:
-        gz="resources/liftover/hg19ToHg38.over.chain.gz"
+        gz=config['deps']['genomes']['chain']
     output:
-        chain=temp("resources/liftover/hg19ToHg38.over.chain")
+        chain=temp(out_dir/"genomes/hg19ToHg38.over.chain")
     shell:
         """
         gunzip -c {input.gz} > {output.chain}

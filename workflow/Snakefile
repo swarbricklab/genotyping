@@ -3,16 +3,18 @@ import pandas as pd
 import numpy as np
 
 # Global paths
-out_dir=Path(config['out_dir'])
-logs=Path(config['log_dir'])
+out_dir=Path(config['outs']['results'])
+logs=Path(config['outs']['logs'])
 final_vcf=out_dir/config['final_vcf']
 
 include: "rules/prep.smk"
 include: "rules/apt.smk"
 include: "rules/bcftools.smk"
+include: "rules/psam.smk"
 
 rule all:
     input:
-        final_vcf
+        final_vcf,
+        out_dir/"samples.psam"
 
 

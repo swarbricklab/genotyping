@@ -5,11 +5,11 @@ rule apt:
     """
     input:
         cel_list=out_dir/"cel_list.txt",
-        arg_file="resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml",
-        dir_annotation="resources/genotyping/annotation/"
+        arg_file=config['deps']['apt']['arg_file']
     output:
         axiom_calls=temp(out_dir/"apt/AxiomGT1.calls.txt"),
         axiom_snp_posteriors=temp(out_dir/"apt/AxiomGT1.snp-posteriors.txt"),
+        apt_report=out_dir/"apt/AxiomGT1.report.txt",
         axiom_dir=temp(directory(out_dir/"apt")),
         data_dir=temp(directory(out_dir/"apt/AxiomAnalysisSuiteData"))
     log:
@@ -21,12 +21,13 @@ rule apt:
         # NOTE: for now I'm assuming the SNP file format is UKB
         #       - TODO: make more generic to process the PMDA array type
         """
+        annotation_dir=$(dirname {input.arg_file})
         apt-genotype-axiom \
             --cel-files {input.cel_list} \
             --out-dir {output.axiom_dir} \
             --batch-folder {output.axiom_dir} \
             --arg-file {input.arg_file} \
-            --analysis-files-path {input.dir_annotation} \
+            --analysis-files-path $annotation_dir \
             --dual-channel-normalization true \
             --summaries --write-models \
             --console-add-neg-select WARNING,summary,debug \
@@ -66,7 +67,7 @@ rule ps_classification:
     """
     input:
         metrics=out_dir/"ps_metrics/metrics.txt",
-        ps2snp_file="resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps"
+        ps2snp_file=config['deps']['apt']['ps2snp']
     output:
         recommended=temp(out_dir/"ps_classification/Recommended.ps"),
         class_dir=temp(directory(out_dir/"ps_classification/"))
@@ -123,7 +124,7 @@ rule make_vcf:
         otv_dir=out_dir/"otv_caller/",
         data_dir=out_dir/"apt/AxiomAnalysisSuiteData/",
         apt_dir=out_dir/"apt",
-        annotation="resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db"
+        annotation=config['deps']['apt']['annotation']
     output:
         vcf_file=temp(out_dir/"make_vcf/combined.b37.vcf")
     log:

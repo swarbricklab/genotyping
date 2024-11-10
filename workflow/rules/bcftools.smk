@@ -6,8 +6,8 @@ rule format_vcf:
     input:
         vcf=out_dir/"make_vcf/combined.b37.vcf",
         samples=out_dir/"sample_map.txt",
-        chr_map="resources/genomes/hg19/map_int2chr.tsv",
-        int_fai_hg19="resources/genomes/hg19/hg19_int.fa.fai"
+        chr_map=out_dir/"genomes/map_int2chr.tsv",
+        int_fai_hg19=out_dir/"genomes/hg19_int.fa.fai"
     output:
         vcf=out_dir/"combined.b37.vcf"
     log:
@@ -30,9 +30,9 @@ rule liftover:
     """
     input:
         vcf_b37=out_dir/"combined.b37.vcf",
-        chain="resources/liftover/hg19ToHg38.over.chain",
-        src_fa="resources/genomes/hg19/hg19.fa",
-        target_fa="resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa"
+        chain=out_dir/"genomes/hg19ToHg38.over.chain",
+        src_fa=out_dir/"genomes/hg19.fa",
+        target_fa=config['deps']['genomes']['target']
     output:
         vcf_hg38=final_vcf
     container:

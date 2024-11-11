@@ -1,6 +1,16 @@
 outs:
-- md5: 7dcd31f7e6b660b580f70370c7b92136.dir
-  size: 1013170456
-  nfiles: 21
-  hash: md5
+- hash: md5
   path: results
+  files:
+  - relpath: final.hg19.vcf
+    md5: 23d781a6ca07a2680aaa4097660bfe7e
+    size: 48283066
+  - relpath: final.hg38.vcf
+    md5: 70e50967a1d7a94f823d3b1bc0e997e3
+    size: 48293261
+  - relpath: final.psam
+    md5: cb0d8102e7e5f348fc2f51a2d48e1402
+    size: 147
+  - relpath: genomes/hg19.fa.fai
+    md5: 9f1cad591d6b711420821efd0f249173
+    size: 12232

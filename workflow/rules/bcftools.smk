@@ -9,7 +9,7 @@ rule format_vcf:
         chr_map=out_dir/"genomes/map_int2chr.tsv",
         int_fai_hg19=out_dir/"genomes/hg19_int.fa.fai"
     output:
-        vcf=out_dir/"combined.b37.vcf"
+        vcf=vcf_hg19
     log:
         logs/"format_vcf.log"
     container:
@@ -29,12 +29,12 @@ rule liftover:
     Lifts over the VCF file from the hg19 reference genome to the hg38 reference genome using a chain file.
     """
     input:
-        vcf_b37=out_dir/"combined.b37.vcf",
+        vcf_b37=vcf_hg19,
         chain=out_dir/"genomes/hg19ToHg38.over.chain",
         src_fa=out_dir/"genomes/hg19.fa",
-        target_fa=config['deps']['genomes']['target']
+        target_fa=config['deps']['genomes']['hg38']
     output:
-        vcf_hg38=final_vcf
+        vcf_hg38=vcf_hg38
     container:
         "docker://yangyxt/bcftools_liftover:1.18"
     log:

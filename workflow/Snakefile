@@ -3,9 +3,11 @@ import pandas as pd
 import numpy as np
 
 # Global paths
-out_dir=Path(config['outs']['results'])
 logs=Path(config['outs']['logs'])
-final_vcf=out_dir/config['final_vcf']
+vcf_hg19=Path(config['outs']['vcf_hg19'])
+vcf_hg38=Path(config['outs']['vcf_hg38'])
+psam=Path(config['outs']['psam'])
+out_dir=vcf_hg38.parent
 
 include: "rules/prep.smk"
 include: "rules/apt.smk"
@@ -14,7 +16,8 @@ include: "rules/psam.smk"
 
 rule all:
     input:
-        final_vcf,
-        out_dir/"samples.psam"
+        vcf_hg19,
+        vcf_hg38,
+        psam
 
 

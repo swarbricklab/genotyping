@@ -5,25 +5,17 @@ deps:
   # Sample sheet. See README for column specifications
   samples: config/samples.csv
   genomes:
-    # Source reference genome (used by the annotation file). For UKB this is hg19
-    src: "resources/genomes/hg19/hg19.fa.gz"
-    # Target reference genome (usually hg38=b38=GRCh38)
-    target: "resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa"
-    # Chain file for lifting over from source to target reference
+    hg19: "resources/genomes/hg19/hg19.fa.gz"
+    hg38: "resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa"
     chain: "resources/liftover/hg19ToHg38.over.chain.gz"
   apt:
-    # XML file defining arguments for processing UKB micro-arrays
     arg_file: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml"
-    annotation_dir: "resources/genotyping/annotation/"
     ps2snp: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps"
     annotation: "resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db"
 
 # Outputs
 outs:
-  # Output directory. All workflow output is below this directory
-  results: test/results
-  # Log directory. All workflow logs are below this directory
-  logs: logs/genotyping
-
-# Name of the final VCF file
-final_vcf: combined.hg38.vcf
+  vcf_hg19: "test/results/final.hg19.vcf"
+  vcf_hg38: "test/results/final.hg38.vcf"
+  psam: "test/results/final.psam"
+  logs: "logs/genotyping"

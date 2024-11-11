@@ -36,7 +36,7 @@ rule prepare_hg19:
     Prepares the hg19 reference genome by decompressing the FASTA file, indexing it, and generating intermediate files for VCF reformatting and liftover.
     """
     input:
-        gz=config['deps']['genomes']['src']
+        gz=config['deps']['genomes']['hg19']
     output:
         fa=temp(out_dir/"genomes/hg19.fa"),
         fai=temp(out_dir/"genomes/hg19.fa.fai"),

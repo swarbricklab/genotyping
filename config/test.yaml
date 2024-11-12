@@ -15,7 +15,7 @@ deps:
 
 # Outputs
 outs:
-  vcf_hg19: "test/results/final.hg19.vcf"
-  vcf_hg38: "test/results/final.hg38.vcf"
-  psam: "test/results/final.psam"
+  vcf_hg19: "test/results/test.hg19.vcf"
+  vcf_hg38: "test/results/test.hg38.vcf"
+  psam: "test/results/test.psam"
   logs: "logs/genotyping"

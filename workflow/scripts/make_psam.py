@@ -20,11 +20,11 @@ print(sample_map_df)
 print("Loading AxiomGT1.report.txt")
 apt_report_df = pd.read_csv(apt_report_file, sep='\t', comment="#")
 apt_report_df.rename(columns={'cel_files': 'CelFileName', 'computed_gender': 'SEX'}, inplace=True)
-print(apt_report_df)
+apt_report_df=apt_report_df[['CelFileName','SEX']]
 
 # Join sample map with sex report on CEL file name
 print("Merging sample mapping and APT report")
-mapped_df = sample_map_df.merge(apt_report_df[['CelFileName', 'SEX']], on='CelFileName', how='left')
+mapped_df = apt_report_df.merge(sample_map_df, on='CelFileName', how='left')
 mapped_df['SEX'] = mapped_df['SEX'].map({'male': 1, 'female': 2}).fillna(0).astype(int)
 print(mapped_df)
 
@@ -38,7 +38,8 @@ psam_df = pd.DataFrame({
     'SEX': mapped_df['SEX'],
     'Provided_Ancestry': ['NONE'] * len(mapped_df)
 })
+print(psam_df)
 
 # Write the PSAM file
-print('Writing metadata.psam')
+print('Writing psam to ' + output_psam)
 psam_df.to_csv(output_psam, sep='\t', index=False)

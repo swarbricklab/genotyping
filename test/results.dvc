@@ -2,15 +2,12 @@ outs:
 - hash: md5
   path: results
   files:
-  - relpath: final.hg19.vcf
-    md5: 23d781a6ca07a2680aaa4097660bfe7e
+  - relpath: test.hg19.vcf
+    md5: 6a6a8f4ab30ad20cc594dede39532ae0
     size: 48283066
-  - relpath: final.hg38.vcf
-    md5: 70e50967a1d7a94f823d3b1bc0e997e3
-    size: 48293261
-  - relpath: final.psam
-    md5: cb0d8102e7e5f348fc2f51a2d48e1402
+  - relpath: test.hg38.vcf
+    md5: 6fcdef02c29b9981c44cb6152b58467b
+    size: 48293259
+  - relpath: test.psam
+    md5: 9d44bcfb4e34fa4bf5cc5f294abd4325
     size: 147
-  - relpath: genomes/hg19.fa.fai
-    md5: 9f1cad591d6b711420821efd0f249173
-    size: 12232

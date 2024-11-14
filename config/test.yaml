@@ -18,4 +18,5 @@ outs:
   vcf_hg19: "test/results/test.hg19.vcf"
   vcf_hg38: "test/results/test.hg38.vcf"
   psam: "test/results/test.psam"
+  id_map: "test/results/id_map.tsv"
   logs: "logs/genotyping"

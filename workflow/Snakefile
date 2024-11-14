@@ -7,6 +7,7 @@ logs=Path(config['outs']['logs'])
 vcf_hg19=Path(config['outs']['vcf_hg19'])
 vcf_hg38=Path(config['outs']['vcf_hg38'])
 psam=Path(config['outs']['psam'])
+id_map=Path(config['outs']['id_map'])
 out_dir=vcf_hg38.parent
 
 include: "rules/prep.smk"
@@ -18,6 +19,7 @@ rule all:
     input:
         vcf_hg19,
         vcf_hg38,
-        psam
+        psam,
+        id_map
 
 

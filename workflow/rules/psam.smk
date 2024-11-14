@@ -7,7 +7,8 @@ rule make_psam:
         sample_map=out_dir/"sample_map.txt",
         apt_report=out_dir/"apt/AxiomGT1.report.txt"
     output:
-        psam=psam
+        psam=psam,
+        id_map=id_map
     log:
         logs/"make_psam.log"
     script:

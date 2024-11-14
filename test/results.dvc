@@ -2,11 +2,14 @@ outs:
 - hash: md5
   path: results
   files:
+  - relpath: id_map.tsv
+    md5: 67a8a88c9031e742b67015fadfbb681a
+    size: 60
   - relpath: test.hg19.vcf
-    md5: 6a6a8f4ab30ad20cc594dede39532ae0
+    md5: 272917186ad49204f4fab82348f06ac6
     size: 48283066
   - relpath: test.hg38.vcf
-    md5: 6fcdef02c29b9981c44cb6152b58467b
+    md5: f4eeab838aac240be278a6dbe28b1dc2
     size: 48293259
   - relpath: test.psam
     md5: 9d44bcfb4e34fa4bf5cc5f294abd4325

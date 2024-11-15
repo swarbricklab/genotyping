@@ -13,7 +13,13 @@ Finally, the genotyping steps in the Swarbrick Lab demuxafy workflow were extrac
 ## Overview
 
 SNP microarray data is stored in `.CEL` files, with one `.CEL` file per sample, as defined in a sample sheet.
-This workflow uses the [Analysis Power Tools](https://www.thermofisher.com/au/en/home/life-science/microarray-analysis/microarray-analysis-partners-programs/affymetrix-developers-network/affymetrix-power-tools.html) (APT) by ThermoFisher Scientific to convert these `.CEL` files into a single VCF file containing high-confidence variant calls for all samples.
+This workflow converts the genotyping information in these `.CEL` files into a VCF file containing high-confidence variant calls for all samples.
+Actually, two versions of this VCF file are produced: one for the `hg19` assembly (build 37) and another for the `hg38` assembly (build 38). 
+
+The workflow also creates a `.psam` file, ready for use with `plink`.
+The sample IDs in this `.psam` file are reformatted (if necessary) by replacing hyphens with underscores, so `id_map.tsv` is provided for switching back and forth between the original and reformatted sample IDs.
+
+This workflow uses the [Analysis Power Tools](https://www.thermofisher.com/au/en/home/life-science/microarray-analysis/microarray-analysis-partners-programs/affymetrix-developers-network/affymetrix-power-tools.html) (APT) by ThermoFisher Scientific.
 Annotation of the VCF file is based on [this annotation reference](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153) (also by ThermoFisher Scientific), which in turn is based on the `hg19` assembly of the human genome. 
 This worklow formats the VCF file by adding header contigs for `hg19` and reformatting the chomosome names from 1, 2, 3, ... to chr1, chr2, chr3, ...
 Finally, the formatted `hg19` VCF file is lifted over to the `hg38` assembly.

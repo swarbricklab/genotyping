@@ -48,3 +48,9 @@ The meanings of each column are as follows:
 Here 'UKB' refers to the [UK Biobank Array](https://www.thermofisher.com/order/catalog/product/902502),while 'PMDA' refers to the [Axiom Precision Medicine Diversity Array](https://www.thermofisher.com/order/catalog/product/951962?SID=srch-srp-951962).
 
 Make sure that the path to the sample sheet is specfied correctly in the config file.
+
+### DVC pipeline
+
+To include this workflow in a DVC pipeline, create a stage in `dvc.yaml`.
+
+TODO: add details on how to do this

@@ -1,8 +1,29 @@
-# Template config. Copy to 'config/genotyping/' and edit as appropriate
+# This config file hows an example of how to configure the genotyping workflow
+# Edit as appropriate to the dataset to which the workflow will be applied
+# Typically refs (=references) can be left unchanged
 
-# Output directory. All workflow output is below this directory
-out_dir: results/genotyping
-# Log directory. All workflow logs are below this directory
-log_dir: logs/genotyping
-# Sample sheet. See README for column specifications
-samples: config/samples.csv
+# Dependencies
+deps:
+  # Sample sheet. See README for column specifications
+  samples: "config/genotyping/samples.csv"
+  # Directory containing .CEL files
+  cel: "data/raw/snp"
+
+# Outputs
+outs:
+  vcf_hg19: "test/results/test.hg19.vcf"
+  vcf_hg38: "test/results/test.hg38.vcf"
+  psam: "test/results/test.psam"
+  id_map: "test/results/id_map.tsv"
+  logs: "logs/genotyping"
+
+# References
+refs:
+  genomes:
+    hg19: "resources/genomes/hg19/hg19.fa.gz"
+    hg38: "resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa"
+    chain: "resources/liftover/hg19ToHg38.over.chain.gz"
+  apt:
+    arg_file: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml"
+    ps2snp: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps"
+    annotation: "resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db"

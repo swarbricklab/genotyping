@@ -5,7 +5,7 @@ rule apt:
     """
     input:
         cel_list=out_dir/"cel_list.txt",
-        arg_file=config['deps']['apt']['arg_file']
+        arg_file=config['refs']['apt']['arg_file']
     output:
         axiom_calls=temp(out_dir/"apt/AxiomGT1.calls.txt"),
         axiom_snp_posteriors=temp(out_dir/"apt/AxiomGT1.snp-posteriors.txt"),
@@ -67,7 +67,7 @@ rule ps_classification:
     """
     input:
         metrics=out_dir/"ps_metrics/metrics.txt",
-        ps2snp_file=config['deps']['apt']['ps2snp']
+        ps2snp_file=config['refs']['apt']['ps2snp']
     output:
         recommended=temp(out_dir/"ps_classification/Recommended.ps"),
         class_dir=temp(directory(out_dir/"ps_classification/"))
@@ -124,7 +124,7 @@ rule make_vcf:
         otv_dir=out_dir/"otv_caller/",
         data_dir=out_dir/"apt/AxiomAnalysisSuiteData/",
         apt_dir=out_dir/"apt",
-        annotation=config['deps']['apt']['annotation']
+        annotation=config['refs']['apt']['annotation']
     output:
         vcf_file=temp(out_dir/"make_vcf/combined.b37.vcf")
     log:

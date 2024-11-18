@@ -32,7 +32,7 @@ rule liftover:
         vcf_b37=vcf_hg19,
         chain=out_dir/"genomes/hg19ToHg38.over.chain",
         src_fa=out_dir/"genomes/hg19.fa",
-        target_fa=config['deps']['genomes']['hg38']
+        target_fa=config['refs']['genomes']['hg38']
     output:
         vcf_hg38=vcf_hg38
     container:

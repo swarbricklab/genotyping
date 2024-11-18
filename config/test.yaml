@@ -4,6 +4,9 @@
 deps:
   # Sample sheet. See README for column specifications
   samples: config/samples.csv
+
+# References
+refs:
   genomes:
     hg19: "resources/genomes/hg19/hg19.fa.gz"
     hg38: "resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa"

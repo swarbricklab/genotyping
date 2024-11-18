@@ -1,0 +1,17 @@
+name: snakemake_7.32.4
+
+channels:
+    - conda-forge
+    - default
+
+dependencies:
+    - snakemake=7.32.4
+    - eido
+    - peppy<0.40
+    - yq
+    - mamba
+    - drmaa
+    - click
+    - csvkit
+    - pv
+    - git>=2.7.2

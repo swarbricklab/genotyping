@@ -6,7 +6,6 @@ rule format_vcf:
     input:
         vcf=out_dir/"make_vcf/combined.b37.vcf",
         samples=out_dir/"sample_map.txt",
-        chr_map=out_dir/"genomes/map_int2chr.tsv",
         int_fai_hg19=out_dir/"genomes/hg19_int.fa.fai"
     output:
         vcf=vcf_hg19
@@ -18,10 +17,10 @@ rule format_vcf:
         """
         grep -v UNKNOWNPOSITION {input.vcf} \
             | bcftools reheader --fai {input.int_fai_hg19} \
-            | bcftools annotate --rename-chrs {input.chr_map} \
             | bcftools reheader -s {input.samples} \
-            | bcftools sort -o {output.vcf} \
+            | bcftools sort -Oz -o {output.vcf} \
             2> {log}
+        bcftools index {output.vcf} 2>> {log}
         """
     
 rule liftover:
@@ -29,7 +28,8 @@ rule liftover:
     Lifts over the VCF file from the hg19 reference genome to the hg38 reference genome using a chain file.
     """
     input:
-        vcf_b37=vcf_hg19,
+        vcf_hg19=vcf_hg19,
+        chr_map=out_dir/"genomes/map_int2chr.tsv",
         chain=out_dir/"genomes/hg19ToHg38.over.chain",
         src_fa=out_dir/"genomes/hg19.fa",
         target_fa=config['refs']['genomes']['hg38']
@@ -41,10 +41,11 @@ rule liftover:
         logs/"liftover.log"
     shell:
         """
-        bcftools +liftover {input.vcf_b37} \
-            --output {output.vcf_hg38} -- \
-            --chain {input.chain} \
-            --src-fasta-ref {input.src_fa} \
-            --fasta-ref {input.target_fa} 2> {log}
+        bcftools annotate --rename-chrs {input.chr_map} {input.vcf_hg19} \
+            | bcftools +liftover - \
+                --output {output.vcf_hg38} -Oz -- \
+                --chain {input.chain} \
+                --src-fasta-ref {input.src_fa} \
+                --fasta-ref {input.target_fa} 2> {log}
         bcftools sort {output.vcf_hg38} 2>> {log}
         """

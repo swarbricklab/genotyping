@@ -48,5 +48,5 @@ rule liftover:
                 --chain {input.chain} \
                 --src-fasta-ref {input.src_fa} \
                 --fasta-ref {input.target_fa} 2> {log}
-        bcftools sort {output.vcf_hg38} 2>> {log}
+        bcftools index {output.vcf_hg38} 2>> {log}
         """

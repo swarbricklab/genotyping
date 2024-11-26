@@ -18,7 +18,8 @@ rule format_vcf:
         grep -v UNKNOWNPOSITION {input.vcf} \
             | bcftools reheader --fai {input.int_fai_hg19} \
             | bcftools reheader -s {input.samples} \
-            | bcftools sort -Oz -o {output.vcf} \
+            | bcftools sort \
+            | bcftools view - -Oz -o {output.vcf} \
             2> {log}
         bcftools index {output.vcf} 2>> {log}
         """

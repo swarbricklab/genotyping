@@ -60,13 +60,13 @@ rule prepare_hg19:
             | sort -n \
             > {output.int_fai}
         cat {output.int_fai} \
-            | awk -F'\t' '{{print $1 "\tchr" $1}}' \
-            | sed 's/chr23/chrY/g' \
-            | sed 's/chr24/chrX/g' \
-            > {output.chr_map}
-        cat {output.chr_map} \
-            | sed 's/chr//g' \
+            | awk -F'\t' '{{print $1 "\t" $1}}' \
+            | sed 's/\t23/\tY/g' \
+            | sed 's/\t24/\tX/g' \
             > {output.intxy_map}
+        cat {output.intxy_map} \
+            | sed 's/\t/\tchr/g' \
+            > {output.chr_map}
         """
 
 rule prepare_chain:

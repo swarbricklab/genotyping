@@ -41,7 +41,8 @@ rule prepare_hg19:
         fa=temp(out_dir/"genomes/hg19.fa"),
         fai=temp(out_dir/"genomes/hg19.fa.fai"),
         int_fai=temp(out_dir/"genomes/hg19_int.fa.fai"),
-        chr_map=temp(out_dir/"genomes/map_int2chr.tsv")
+        chr_map=temp(out_dir/"genomes/map_int2chr.tsv"),
+        intxy_map=temp(out_dir/"genomes/map_int2chr.tsv")
     container:
          "docker://quay.io/biocontainers/samtools:1.21--h50ea8bc_0"
     log:
@@ -63,6 +64,9 @@ rule prepare_hg19:
             | sed 's/chr23/chrY/g' \
             | sed 's/chr24/chrX/g' \
             > {output.chr_map}
+        cat {output.chr_map} \
+            | sed 's/chr//g' \
+            > {output.intxy_map}
         """
 
 rule prepare_chain:

@@ -4,9 +4,10 @@ rule format_vcf:
     Formats the generated VCF by removing unknown positions, reheadering, renaming chromosomes, and sorting it.
     """
     input:
-        vcf=out_dir/"make_vcf/combined.b37.vcf",
-        samples=out_dir/"sample_map.txt",
-        int_fai_hg19=out_dir/"genomes/hg19_int.fa.fai"
+        vcf=rules.make_vcf.output.vcf_file,
+        samples=rules.map_samples.output.mapping,
+        intxy_map=rules.prepare_hg19.output.intxy_map,
+        int_fai_hg19=rules.prepare_hg19.output.fai
     output:
         vcf=vcf_hg19
     log:
@@ -18,6 +19,7 @@ rule format_vcf:
         grep -v UNKNOWNPOSITION {input.vcf} \
             | bcftools reheader --fai {input.int_fai_hg19} \
             | bcftools reheader -s {input.samples} \
+            | bcftools annotate --rename-chrs {input.intxy_map} \
             | bcftools sort \
             | bcftools view - -Oz -o {output.vcf} \
             2> {log}

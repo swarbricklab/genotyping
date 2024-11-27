@@ -42,7 +42,7 @@ rule prepare_hg19:
         fai=temp(out_dir/"genomes/hg19.fa.fai"),
         int_fai=temp(out_dir/"genomes/hg19_int.fa.fai"),
         chr_map=temp(out_dir/"genomes/map_int2chr.tsv"),
-        intxy_map=temp(out_dir/"genomes/map_int2chr.tsv")
+        intxy_map=temp(out_dir/"genomes/map_int2intxy.tsv")
     container:
          "docker://quay.io/biocontainers/samtools:1.21--h50ea8bc_0"
     log:

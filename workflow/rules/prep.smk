@@ -65,6 +65,7 @@ rule prepare_hg19:
             | sed 's/\t24/\tX/g' \
             > {output.intxy_map}
         cat {output.intxy_map} \
+            | awk -F'\t' 'BEGIN {{OFS="\t"}} {{print $2, $2}}' \
             | sed 's/\t/\tchr/g' \
             > {output.chr_map}
         """

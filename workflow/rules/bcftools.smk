@@ -6,10 +6,10 @@ rule format_vcf:
     input:
         vcf=rules.make_vcf.output.vcf_file,
         samples=rules.map_samples.output.mapping,
-        intxy_map=rules.prepare_hg19.output.intxy_map,
-        int_fai_hg19=rules.prepare_hg19.output.int_fai
+        intxy_map=rules.prepare_chromosome_maps.output.intxy_map,
+        int_fai_hg19=rules.prepare_int_fai.output.int_fai
     output:
-        vcf=vcf_hg19
+        vcf_hg19=temp(out_dir/"format/combined.hg19.vcf")
     log:
         logs/"format_vcf.log"
     container:
@@ -21,9 +21,8 @@ rule format_vcf:
             | bcftools reheader -s {input.samples} \
             | bcftools annotate --rename-chrs {input.intxy_map} \
             | bcftools sort \
-            | bcftools view - -Oz -o {output.vcf} \
+            | bcftools view - -o {output.vcf_hg19} \
             2> {log}
-        bcftools index {output.vcf} 2>> {log}
         """
     
 rule liftover:
@@ -31,13 +30,13 @@ rule liftover:
     Lifts over the VCF file from the hg19 reference genome to the hg38 reference genome using a chain file.
     """
     input:
-        vcf_hg19=rules.format_vcf.output.vcf,
-        chr_map=out_dir/"genomes/map_int2chr.tsv",
-        chain=out_dir/"genomes/hg19ToHg38.over.chain",
-        src_fa=out_dir/"genomes/hg19.fa",
+        vcf_hg19=rules.format_vcf.output.vcf_hg19,
+        chr_map=rules.prepare_chromosome_maps.output.chr_map,
+        chain=rules.prepare_chain.output.chain,
+        src_fa=rules.prepare_hg19.output.fa,
         target_fa=config['refs']['genomes']['hg38']
     output:
-        vcf_hg38=vcf_hg38
+        vcf_hg38=temp(out_dir/"liftover/combined.hg38.vcf")
     container:
         "docker://yangyxt/bcftools_liftover:1.18"
     log:
@@ -49,7 +48,26 @@ rule liftover:
                 --chain {input.chain} \
                 --src-fasta-ref {input.src_fa} \
                 --fasta-ref {input.target_fa} \
-            | bcftools sort -Oz -o {output.vcf_hg38} \
+            | bcftools sort -o {output.vcf_hg38} \
             2> {log}
-        bcftools index {output.vcf_hg38} 2>> {log}
+        """
+
+rule remove_timestamps:
+    input:
+        hg19=rules.format_vcf.output.vcf_hg19,
+        hg38=rules.liftover.output.vcf_hg38
+    output:
+        vcf_hg19=vcf_hg19,
+        vcf_hg38=vcf_hg38
+    log:
+        logs/"remove_timestamps.log"
+    container:
+        "docker://quay.io/biocontainers/bcftools:1.21--h8b25389_0"
+    shell:
+        """
+            function remove_dates () {{
+                cat $1 | sed 's/; Date=.*//' | sed '/^##fileDate=/d'
+            }}
+            remove_dates {input.hg19} | bgzip -c > {output.vcf_hg19}
+            remove_dates {input.hg38} | bgzip -c > {output.vcf_hg38}
         """

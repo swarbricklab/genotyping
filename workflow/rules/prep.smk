@@ -39,10 +39,7 @@ rule prepare_hg19:
         gz=config['refs']['genomes']['hg19']
     output:
         fa=temp(out_dir/"genomes/hg19.fa"),
-        fai=temp(out_dir/"genomes/hg19.fa.fai"),
-        int_fai=temp(out_dir/"genomes/hg19_int.fa.fai"),
-        chr_map=temp(out_dir/"genomes/map_int2chr.tsv"),
-        intxy_map=temp(out_dir/"genomes/map_int2intxy.tsv")
+        fai=temp(out_dir/"genomes/hg19.fa.fai")
     container:
          "docker://quay.io/biocontainers/samtools:1.21--h50ea8bc_0"
     log:
@@ -51,7 +48,16 @@ rule prepare_hg19:
         """
         gunzip -c {input.gz} > {output.fa}
         samtools faidx {output.fa}
-        cat {output.fai} \
+        """
+
+rule prepare_int_fai:
+    input:
+        fai=rules.prepare_hg19.output.fai
+    output:
+        int_fai=temp(out_dir/"genomes/hg19_int.fa.fai")
+    shell:
+        """
+        cat {input.fai} \
             | sed '/_/d' \
             | sed '/M/d' \
             | sed 's/^chr//g' \
@@ -59,7 +65,17 @@ rule prepare_hg19:
             | sed 's/X/24/g' \
             | sort -n \
             > {output.int_fai}
-        cat {output.int_fai} \
+        """
+
+rule prepare_chromosome_maps:
+    input:
+        int_fai=rules.prepare_int_fai.output.int_fai
+    output:
+        chr_map=temp(out_dir/"genomes/map_intxy2chr.tsv"),
+        intxy_map=temp(out_dir/"genomes/map_int2intxy.tsv")
+    shell:
+        """
+        cat {input.int_fai} \
             | awk -F'\t' '{{print $1 "\t" $1}}' \
             | sed 's/\t23/\tY/g' \
             | sed 's/\t24/\tX/g' \

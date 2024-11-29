@@ -1,22 +1,6 @@
 outs:
-- hash: md5
+- md5: 316cbeeb4fa69df7e82fc607872cd7a7.dir
+  size: 15346324
+  nfiles: 4
+  hash: md5
   path: results
-  files:
-  - relpath: id_map.tsv
-    md5: 67a8a88c9031e742b67015fadfbb681a
-    size: 60
-  - relpath: test.hg19.vcf.gz
-    md5: 227de530a05aee9dd0225e041ced61b5
-    size: 7657982
-  - relpath: test.hg19.vcf.gz.csi
-    md5: 14ce89efb96ce3add6835764fc14fcf6
-    size: 1163579
-  - relpath: test.hg38.vcf.gz
-    md5: 3aacc0ad32cff5f4dff413de2296dd62
-    size: 8417792
-  - relpath: test.hg38.vcf.gz.csi
-    md5: c6cd45a47e28a7c11904f31c8a425ae3
-    size: 1166361
-  - relpath: test.psam
-    md5: 9d44bcfb4e34fa4bf5cc5f294abd4325
-    size: 147

@@ -5,3 +5,4 @@ sample,cel_files,array_type
 3930,test/data/SNP3930.CEL,UKB
 3840,test/data/SNP3840.CEL,UKB
 3564,test/data/SNP3564.CEL,UKB
+PBMC,test/data/SNP_PBMC.CEL,UKB

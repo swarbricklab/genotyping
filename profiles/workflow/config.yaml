@@ -16,9 +16,9 @@ set-resources:
   map_samples:
     threads: 1
     mem: "4GB"
-    runtime: 1
+    runtime: 5
   list_cel_files:
-    threads: 1
+    threads: 5
     mem: "4GB"
     runtime: 1
   apt:

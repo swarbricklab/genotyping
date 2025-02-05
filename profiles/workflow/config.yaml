@@ -31,7 +31,7 @@ set-resources:
   otv_caller:
     threads: 20
     mem: "4GB"
-    runtime: 30
+    runtime: 120
   ps_metrics:
     threads: 10
     mem: "8GB"

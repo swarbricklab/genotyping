@@ -7,14 +7,14 @@ deps:
   # Sample sheet. See README for column specifications
   samples: "config/genotyping/samples.csv"
   # Directory containing .CEL files
-  cel: "data/raw/snp"
+  cel: "data/snp/microarray"
 
 # Outputs
 outs:
-  vcf_hg19: "test/results/test.hg19.vcf"
-  vcf_hg38: "test/results/test.hg38.vcf"
-  psam: "test/results/test.psam"
-  id_map: "test/results/id_map.tsv"
+  vcf_hg19: "data/snp/genotyping/donors.hg19.vcf"
+  vcf_hg38: "data/snp/genotyping/donors.hg38.vcf"
+  psam: "data/snp/genotyping/test.psam"
+  id_map: "data/snp/genotyping/id_map.tsv"
   logs: "logs/genotyping"
 
 # References

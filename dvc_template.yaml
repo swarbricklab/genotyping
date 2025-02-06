@@ -1,0 +1,17 @@
+  genotyping:
+    cmd: ./modules/genotyping/run_mod.sh
+    deps:
+      - modules/genotyping/run_mod.sh
+      - modules/genotyping/workflow
+      - config/genotyping/config.yaml
+      - config/genotyping/samples.csv
+      - data/snp/microarray
+      - resources/genomes/hg19/hg19.fa.gz
+      - resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa
+      - resources/liftover/hg19ToHg38.over.chain.gz
+      - resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml
+      - resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps
+      - resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db
+    outs:
+      - data/snp/genotyping
+      - logs/genotyping

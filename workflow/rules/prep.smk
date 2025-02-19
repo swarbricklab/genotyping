@@ -3,7 +3,7 @@ rule map_samples:
     Creates a mapping file that maps CEL file names to sample names, extracted from the given sample sheet.
     """
     input:
-        samplesheet=config['deps']['samples']
+        samplesheet=config['deps']['donors']
     output:
         mapping=temp(out_dir/"sample_map.txt")
     run:
@@ -21,7 +21,7 @@ rule list_cel_files:
     Creates a list of all unique CEL files by reading the sample sheet and removing duplicates.
     """
     input:
-        samplesheet=config['deps']['samples']
+        samplesheet=config['deps']['donors']
     output:
         cel_list=temp(out_dir/"cel_list.txt")
     log:

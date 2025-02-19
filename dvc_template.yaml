@@ -4,7 +4,7 @@
       - modules/genotyping/run_mod.sh
       - modules/genotyping/workflow
       - config/genotyping/config.yaml
-      - config/genotyping/samples.csv
+      - config/genotyping/donors.csv
       - data/snp/microarray
       - resources/genomes/hg19/hg19.fa.gz
       - resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa

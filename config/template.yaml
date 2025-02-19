@@ -5,7 +5,7 @@
 # Dependencies
 deps:
   # Sample sheet. See README for column specifications
-  samples: "config/genotyping/samples.csv"
+  donors: "config/genotyping/donors.csv"
   # Directory containing .CEL files
   cel: "data/snp/microarray"
 

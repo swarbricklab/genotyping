@@ -1,4 +1,4 @@
-sample,cel_files,array_type
+donor,cel_files,array_type
 3947,test/data/SNP3947.CEL,UKB
 3561,test/data/SNP3561.CEL,UKB
 3558,test/data/SNP3558.CEL,UKB

@@ -2,7 +2,7 @@
 
 Configuring the workflow involves editing two files:
 - config file (see [this template](config/template.yaml) for an example)
-- sample sheet (see [this example](config/samples.csv) used for testing)
+- sample sheet (see [this example](config/donors.csv) used for testing)
 
 ### Config file
 
@@ -35,7 +35,7 @@ The sample sheet is a CSV file with the following columns:
 - array_type
 
 These column names are fixed, but additional columns can be added if desired.
-See [this example](config/samples.csv).
+See [this example](config/donors.csv).
 
 The meanings of each column are as follows:
 

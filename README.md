@@ -12,12 +12,12 @@ Finally, the genotyping steps in the Swarbrick Lab demuxafy workflow were extrac
 
 ## Overview
 
-SNP microarray data is stored in `.CEL` files, with one `.CEL` file per sample, as defined in a sample sheet.
-This workflow converts the genotyping information in these `.CEL` files into a VCF file containing high-confidence variant calls for all samples.
+SNP microarray data is stored in `.CEL` files, with one `.CEL` file per donor sample, as defined in a sample sheet (`donors.csv`).
+This workflow converts the genotyping information in these `.CEL` files into a VCF file containing high-confidence variant calls for all donor samples.
 Actually, two versions of this VCF file are produced: one for the `hg19` assembly (build 37) and another for the `hg38` assembly (build 38). 
 
 The workflow also creates a `.psam` file, ready for use with `plink`.
-The sample IDs in this `.psam` file are reformatted (if necessary) by replacing hyphens with underscores, so `id_map.tsv` is provided for switching back and forth between the original and reformatted sample IDs.
+The donor IDs in this `.psam` file are reformatted (if necessary) by replacing hyphens with underscores, so `id_map.tsv` is provided for switching back and forth between the original and reformatted donor IDs.
 
 This workflow uses the [Analysis Power Tools](https://www.thermofisher.com/au/en/home/life-science/microarray-analysis/microarray-analysis-partners-programs/affymetrix-developers-network/affymetrix-power-tools.html) (APT) by ThermoFisher Scientific.
 Annotation of the VCF file is based on [this annotation reference](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153) (also by ThermoFisher Scientific), which in turn is based on the `hg19` assembly of the human genome. 
@@ -36,7 +36,7 @@ Further reading: [Axiom Genotyping Solution Data Analysis User Guide](https://as
 
 Configuring the workflow involves editing two files:
 - config file (see [this template](config/template.yaml) for an example)
-- sample sheet (see [this example](config/samples.csv) used for testing)
+- sample sheet (see [this example](config/donors.csv) used for testing)
 
 ### Config file
 
@@ -55,19 +55,19 @@ Refer to the comments in the template for the meaning for each item.
 ### Sample sheet
 
 The sample sheet is a CSV file with the following columns:
-- sample
+- donor
 - cel_files
 - array_type
 
 These column names are fixed, but additional columns can be added if desired.
-See [this example](config/samples.csv).
+See [this example](config/donor.csv).
 
 The meanings of each column are as follows:
 
 | Column | Meaning |
 |--------|---------|
-| sample | The sample id to use in the VCF header |
-| cel_files | The path to the .CEL file for each sample, relative to the top of the super project |
+| donor | The donor id to use in the VCF header |
+| cel_files | The path to the .CEL file for each donor, relative to the top of the super project |
 | array_type | Either 'UKB' or 'PMDA' |
 
 Here 'UKB' refers to the [UK Biobank Array](https://www.thermofisher.com/order/catalog/product/902502),while 'PMDA' refers to the [Axiom Precision Medicine Diversity Array](https://www.thermofisher.com/order/catalog/product/951962?SID=srch-srp-951962).

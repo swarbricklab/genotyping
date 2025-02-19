@@ -5,7 +5,7 @@ rule format_vcf:
     """
     input:
         vcf=rules.make_vcf.output.vcf_file,
-        samples=rules.map_samples.output.mapping,
+        donors=rules.map_donors.output.mapping,
         intxy_map=rules.prepare_chromosome_maps.output.intxy_map,
         int_fai_hg19=rules.prepare_int_fai.output.int_fai
     output:
@@ -18,7 +18,7 @@ rule format_vcf:
         """
         grep -v UNKNOWNPOSITION {input.vcf} \
             | bcftools reheader --fai {input.int_fai_hg19} \
-            | bcftools reheader -s {input.samples} \
+            | bcftools reheader -s {input.donors} \
             | bcftools annotate --rename-chrs {input.intxy_map} \
             | bcftools sort \
             | bcftools view - -o {output.vcf_hg19} \

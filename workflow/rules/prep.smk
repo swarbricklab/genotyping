@@ -1,6 +1,6 @@
-rule map_samples:
+rule map_donors:
     """
-    Creates a mapping file that maps CEL file names to sample names, extracted from the given sample sheet.
+    Creates a mapping file that maps CEL file names to donor names, extracted from the given sample sheet.
     """
     input:
         samplesheet=config['deps']['donors']
@@ -12,7 +12,7 @@ rule map_samples:
         # Extract just the filename (without path) from 'cel_files' column
         samples_df['cel_file_name'] = samples_df['cel_files'].apply(lambda x: Path(x).name)
         # Create a new DataFrame with only 'cel_file_name' and 'sample' columns for the mapping
-        samples_df[['cel_file_name', 'sample']].to_csv(output.mapping, sep='\t', header=False, index=False)
+        samples_df[['cel_file_name', 'donor']].to_csv(output.mapping, sep='\t', header=False, index=False)
 
 
 # Generate list of all unique CEL files in the sample sheet

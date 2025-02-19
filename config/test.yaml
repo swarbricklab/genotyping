@@ -3,7 +3,7 @@
 # Dependencies
 deps:
   # Sample sheet. See README for column specifications
-  donors: config/donor.csv
+  donors: config/donors.csv
 
 # References
 refs:

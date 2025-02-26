@@ -14,4 +14,4 @@
       - resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db
     outs:
       - data/snp/genotyping
-      - logs/genotyping
+      - logs/snp/genotyping

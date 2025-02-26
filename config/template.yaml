@@ -15,7 +15,7 @@ outs:
   vcf_hg38: "data/snp/genotyping/donors.hg38.vcf"
   psam: "data/snp/genotyping/test.psam"
   id_map: "data/snp/genotyping/id_map.tsv"
-  logs: "logs/genotyping"
+  logs: "logs/snp/genotyping"
 
 # References
 refs:

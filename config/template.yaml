@@ -13,7 +13,7 @@ deps:
 outs:
   vcf_hg19: "data/snp/genotyping/donors.hg19.vcf.gz"
   vcf_hg38: "data/snp/genotyping/donors.hg38.vcf.gz"
-  psam: "data/snp/genotyping/test.psam"
+  psam: "data/snp/genotyping/donors.psam"
   id_map: "data/snp/genotyping/id_map.tsv"
   logs: "logs/snp/genotyping"
 

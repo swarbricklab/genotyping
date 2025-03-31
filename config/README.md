@@ -20,6 +20,9 @@ Refer to the comments in the template for the meaning for each item.
 
 ### Sample sheet
 
+The sample sheet links donors to the `.CEL` file for each donor sample.
+There should be exactly one row per donor -- no duplicates.
+
 The sample sheet is a CSV file with the following columns:
 - donor
 - cel_files

@@ -23,7 +23,7 @@ fi
 # Make rule graph
 mkdir -p docs/graphs
 snakemake $global_profile $workflow_profile \
-    --snakefile modules/$module/Snakefile \
+    --snakefile modules/$module/workflow/Snakefile \
     --configfile config/$module/config.yaml \
     --rulegraph \
     | dot -Tsvg \

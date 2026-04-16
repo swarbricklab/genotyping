@@ -23,8 +23,8 @@ set-resources:
     runtime: 1
   apt:
     threads: 10
-    mem: "16GB"
-    runtime: 20
+    mem: "32GB"
+    runtime: 60
   make_vcf:
     mem: "12GB"
     runtime: 20
@@ -35,11 +35,11 @@ set-resources:
   ps_metrics:
     threads: 10
     mem: "8GB"
-    runtime: 5
+    runtime: 10
   ps_classification:
     threads: 10
     mem: "8GB"
-    runtime: 10
+    runtime: 20
   format_vcf:
     threads: 1
     mem: "8GB"

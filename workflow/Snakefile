@@ -13,8 +13,8 @@ out_dir=vcf_hg38.parent
 # Container image providing APT and SNPolisher for the rules in apt.smk.
 #
 # APT is proprietary and cannot be redistributed with this workflow, so the
-# image has to be supplied by whoever runs it. Build one with the recipes in
-# containers/apt/ and set containers.apt in the config file, either to a
+# image has to be supplied by whoever runs it. Build one with the Dockerfile
+# in containers/apt/ and set containers.apt in the config file, either to a
 # registry reference or to the path of a local .sif file.
 #
 # The default below names the image used for our published runs. It is a

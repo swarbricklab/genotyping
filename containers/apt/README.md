@@ -1,15 +1,11 @@
 # APT container
 
-Build recipes for a container image containing Thermo Fisher [Analysis Power
+`Dockerfile` builds a container image containing Thermo Fisher [Analysis Power
 Tools](https://www.thermofisher.com/us/en/home/life-science/microarray-analysis/microarray-analysis-partners-programs/affymetrix-developers-network/affymetrix-power-tools.html)
 (APT) and SNPolisher, used by the rules in `workflow/rules/apt.smk`.
 
-- `Dockerfile` — for sites with docker or podman.
-- `apt.def` — Singularity/Apptainer equivalent, for sites such as NCI Gadi
-  that provide singularity but not docker.
-
-Both download APT from Thermo Fisher at build time, verify it against a
-recorded SHA-256, and fail the build if it does not match.
+It downloads APT from Thermo Fisher at build time, verifies it against a
+recorded SHA-256, and fails the build if it does not match.
 
 ## Why you have to build this yourself
 
@@ -45,10 +41,10 @@ comes from.
 ## Versions
 
 Thermo Fisher publishes **only the current release**. At the time of writing
-that is 2.12.0, which is the default in both recipes.
+that is 2.12.0, which is the default here.
 
 > **The manuscript run used APT 2.10.0, which can no longer be downloaded.**
-> Building from these recipes gives you 2.12.0, not a reproduction of that
+> Building from this Dockerfile gives you 2.12.0, not a reproduction of that
 > run. There is no way to rebuild 2.10.x from a Thermo Fisher URL; if you need
 > it, you need an archived copy of the original zip.
 
@@ -68,21 +64,11 @@ So when quoting a version, say which binary you mean. Genotypes are called by
 
 ## Building
 
-With docker:
-
 ```bash
 docker build -t apt:2.12.0 containers/apt
 ```
 
-With singularity:
-
-```bash
-module load singularity
-singularity build --fakeroot apt-2.12.0.sif containers/apt/apt.def
-```
-
-To pin a different version with docker, override both the version and its
-checksum:
+To pin a different version, override both the version and its checksum:
 
 ```bash
 docker build -t apt:2.11.6 \
@@ -91,34 +77,41 @@ docker build -t apt:2.11.6 \
   containers/apt
 ```
 
-For singularity, edit `APT_VERSION` and `APT_SHA256` at the top of `%post` in
-`apt.def` instead. Build arguments are not used there because `--build-arg`
-and `%arguments` templating are unavailable in SingularityCE 3.11, which is
-the version provided on Gadi.
-
-Both recipes run `apt-genotype-axiom --version` as a build-time test, so the
-real version is recorded in the build log.
+The build runs `apt-genotype-axiom --version` as a test, so the real version
+is recorded in the build log.
 
 ## Wiring it into the workflow
 
-Set `containers.apt` in your config file. It accepts either a registry
-reference or the path to a local `.sif`:
+Set `containers.apt` in your config file to the image you built:
+
+```yaml
+containers:
+  apt: "docker://your-registry/apt:2.12.0"
+```
+
+That one value is used by all five APT rules (`apt`, `ps_metrics`,
+`ps_classification`, `otv_caller`, `make_vcf`).
+
+Snakemake converts `docker://` references to Singularity images on the fly
+when run with `--use-singularity`, so a registry reference is all that is
+needed. Because APT cannot be redistributed, that registry has to be one you
+control — a private repository, or a registry internal to your institution.
+
+If you cannot push to a registry, or you are on a cluster with Singularity but
+no Docker (NCI Gadi, for example), export the image you built and convert it
+once, then point `containers.apt` at the resulting file:
+
+```bash
+docker save apt:2.12.0 -o apt-2.12.0.tar
+singularity build apt-2.12.0.sif docker-archive://apt-2.12.0.tar
+```
 
 ```yaml
 containers:
   apt: "containers/apt-2.12.0.sif"
 ```
 
-That one value is used by all five APT rules (`apt`, `ps_metrics`,
-`ps_classification`, `otv_caller`, `make_vcf`).
-
-If you built with docker and want singularity to run it, convert the image
-once:
-
-```bash
-docker save apt:2.12.0 -o apt-2.12.0.tar
-singularity build apt-2.12.0.sif docker-archive://apt-2.12.0.tar
-```
+`containers.apt` accepts either form.
 
 If you omit `containers.apt`, the workflow falls back to the image used for our
 published runs. That repository is **private**, so the fallback will fail to

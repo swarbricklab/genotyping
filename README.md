@@ -45,15 +45,16 @@ The EULA grants a non-transferable licence, with no right to sublicense, to use 
 APT is not open source: the 2.x downloads ship no source code, and the GPL terms that search results often surface apply to the retired 1.x series.
 
 APT is therefore **not covered by the licence for this repository, and cannot be redistributed with it**.
-To run the `apt`, `ps_metrics`, `ps_classification`, `otv_caller` and `make_vcf` rules you must obtain APT from ThermoFisher yourself, under your own acceptance of their terms, and build a container image from the recipes in [`containers/apt/`](containers/apt/).
-Then point the workflow at it with `containers.apt` in your config file -- a registry reference or the path to a local `.sif`:
+To run the `apt`, `ps_metrics`, `ps_classification`, `otv_caller` and `make_vcf` rules you must obtain APT from ThermoFisher yourself, under your own acceptance of their terms, and build a container image using the [`Dockerfile`](containers/apt/Dockerfile) in `containers/apt/`.
+Then point the workflow at it with `containers.apt` in your config file:
 
 ```yaml
 containers:
-  apt: "containers/apt-2.12.0.sif"
+  apt: "docker://your-registry/apt:2.12.0"
 ```
 
-See [`containers/apt/README.md`](containers/apt/README.md) for the build and conversion commands.
+Because APT cannot be redistributed, that registry has to be one you control.
+See [`containers/apt/README.md`](containers/apt/README.md) for the build commands, and for how to use the image on a cluster that provides Singularity but not Docker.
 
 > Earlier revisions of this workflow pinned `docker://swarbricklab/ctp-tools:apt-2.10.2`, a public image that bundled the APT binaries.
 > That image is no longer public, because publishing it was not compatible with the EULA above.
@@ -61,7 +62,7 @@ See [`containers/apt/README.md`](containers/apt/README.md) for the build and con
 
 Note that the version recorded in that image tag was not accurate: `apt-genotype-axiom` in it reports **2.10.0**, while the SNPolisher tools report 2.10.2.
 Genotypes are called by `apt-genotype-axiom`, so **2.10.0** is the version to quote for the calling step.
-ThermoFisher publishes only the current release, so 2.10.x can no longer be downloaded; the recipes in `containers/apt/` default to 2.12.0 and do **not** reproduce the original run.
+ThermoFisher publishes only the current release, so 2.10.x can no longer be downloaded; the `Dockerfile` in `containers/apt/` defaults to 2.12.0 and does **not** reproduce the original run.
 
 The array annotation files referenced under `refs.apt` in the config file (`Axiom_UKB_WCSG.*`) are vendor-supplied and likewise cannot be redistributed here.
 They must be downloaded from the relevant ThermoFisher [product page](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153).

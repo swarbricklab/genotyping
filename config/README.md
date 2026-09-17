@@ -20,7 +20,7 @@ Refer to the comments in the template for the meaning for each item.
 
 One item usually does need changing: **`containers.apt`**.
 This names the container image providing Analysis Power Tools (APT) and SNPolisher, which are proprietary and cannot be redistributed with this workflow.
-Build your own image with the recipes in [`containers/apt/`](../containers/apt/) and set `containers.apt` to either a registry reference or the path of a local `.sif` file.
+Build your own image with the [`Dockerfile`](../containers/apt/Dockerfile) in `containers/apt/` and set `containers.apt` to either a registry reference or the path of a local `.sif` file.
 
 The value in the template is the image used for our published runs, and its registry repository is private, so it will not pull without credentials.
 That fallback is deliberate -- it keeps existing dataset configs resolving to the exact image their results came from -- but it means an authentication error on the first APT rule indicates that `containers.apt` has not been set.

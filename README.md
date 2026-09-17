@@ -40,11 +40,23 @@ Further reading: [Axiom Genotyping Solution Data Analysis User Guide](https://as
 
 ## Third-party software
 
-The genotyping rules call the [Analysis Power Tools](https://www.thermofisher.com/au/en/home/life-science/microarray-analysis/microarray-analysis-partners-programs/affymetrix-developers-network/affymetrix-power-tools.html) (APT) and SNPolisher, which are **proprietary software distributed by ThermoFisher Scientific under their own licence terms**.
-They are not covered by the licence for this repository, and this repository does not redistribute them.
-To run the workflow you must obtain APT from ThermoFisher and make it available to the `apt`, `ps_metrics`, `ps_classification`, `otv_caller` and `make_vcf` rules.
+The genotyping rules call the [Analysis Power Tools](https://www.thermofisher.com/au/en/home/life-science/microarray-analysis/microarray-analysis-partners-programs/affymetrix-developers-network/affymetrix-power-tools.html) (APT) and SNPolisher, which are **proprietary software** distributed by Life Technologies Corporation (ThermoFisher Scientific) under an End User License Agreement.
+The EULA grants a non-transferable licence, with no right to sublicense, to use the software on computers you own or control, for research use only, and prohibits distributing or electronically transmitting it -- alone or combined with other products.
+APT is not open source: the 2.x downloads ship no source code, and the GPL terms that search results often surface apply to the retired 1.x series.
 
-The same applies to the array annotation files referenced under `refs.apt` in the config file (`Axiom_UKB_WCSG.*`), which must be downloaded from the relevant ThermoFisher [product page](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153).
+APT is therefore **not covered by the licence for this repository, and cannot be redistributed with it**.
+To run the `apt`, `ps_metrics`, `ps_classification`, `otv_caller` and `make_vcf` rules you must obtain APT from ThermoFisher yourself, under your own acceptance of their terms, and build a container image from the recipes in [`containers/apt/`](containers/apt/) -- see [`containers/apt/README.md`](containers/apt/README.md) for how to build it and point the rules at it.
+
+> Earlier revisions of this workflow pinned `docker://swarbricklab/ctp-tools:apt-2.10.2`, a public image that bundled the APT binaries.
+> That image is no longer public, because publishing it was not compatible with the EULA above.
+> Anything pinning a `paper/`-tagged revision of this workflow will still reference it and will need to be repointed at a locally built image.
+
+Note that the version recorded in that image tag was not accurate: `apt-genotype-axiom` in it reports **2.10.0**, while the SNPolisher tools report 2.10.2.
+Genotypes are called by `apt-genotype-axiom`, so **2.10.0** is the version to quote for the calling step.
+ThermoFisher publishes only the current release, so 2.10.x can no longer be downloaded; the recipes in `containers/apt/` default to 2.12.0 and do **not** reproduce the original run.
+
+The array annotation files referenced under `refs.apt` in the config file (`Axiom_UKB_WCSG.*`) are vendor-supplied and likewise cannot be redistributed here.
+They must be downloaded from the relevant ThermoFisher [product page](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153).
 
 The remaining rules use openly licensed containers: [bcftools](https://github.com/samtools/bcftools) (MIT/Expat) and [samtools](https://github.com/samtools/samtools) (MIT/Expat) via [BioContainers](https://biocontainers.pro/), and the [bcftools +liftover](https://github.com/freeseek/score) plugin (MIT).
 

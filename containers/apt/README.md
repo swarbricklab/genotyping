@@ -64,6 +64,17 @@ So when quoting a version, say which binary you mean. Genotypes are called by
 
 ## Building
 
+The easiest route is [`prep.sh`](../../prep.sh), which builds the image, converts
+it for Singularity if needed, and places it wherever `containers.apt` points:
+
+```bash
+./prep.sh --configfile <your config file>
+```
+
+It is idempotent, and it verifies that APT actually runs inside the image before
+putting it in place. The rest of this section covers doing the same steps by
+hand.
+
 ```bash
 docker build -t apt:2.12.0 containers/apt
 ```
@@ -92,26 +103,46 @@ containers:
 That one value is used by all five APT rules (`apt`, `ps_metrics`,
 `ps_classification`, `otv_caller`, `make_vcf`).
 
-Snakemake converts `docker://` references to Singularity images on the fly
-when run with `--use-singularity`, so a registry reference is all that is
-needed. Because APT cannot be redistributed, that registry has to be one you
-control — a private repository, or a registry internal to your institution.
+Snakemake runs containers **only** through Singularity — there is no Docker
+runtime path, even for a `docker://` reference. Such a reference is simply a URI
+that Singularity knows how to fetch and convert, which it does on the fly under
+`--use-singularity`. So a registry reference is all that is needed. Because APT
+cannot be redistributed, that registry has to be one you control — a private
+repository, or a registry internal to your institution.
 
-If you cannot push to a registry, or you are on a cluster with Singularity but
-no Docker (NCI Gadi, for example), export the image you built and convert it
-once, then point `containers.apt` at the resulting file:
-
-```bash
-docker save apt:2.12.0 -o apt-2.12.0.tar
-singularity build apt-2.12.0.sif docker-archive://apt-2.12.0.tar
-```
+`containers.apt` also accepts a local path:
 
 ```yaml
 containers:
   apt: "containers/apt-2.12.0.sif"
 ```
 
-`containers.apt` accepts either form.
+Two consequences of everything going through Singularity are worth knowing:
+
+- A local path has to be a **Singularity image file**. An image sitting in a
+  local Docker daemon cannot be named by path, and a `docker save` tarball is
+  not a SIF — pointing at one fails with `invalid SIF magic`. Convert it first.
+- Relative paths are resolved against the directory you run Snakemake from
+  (the top of the super-project), not against this module.
+
+So if you cannot push to a registry, or you are on a cluster with Singularity
+but no Docker (NCI Gadi, for example), convert the image once. `prep.sh` will do
+this for you:
+
+```bash
+docker save apt:2.12.0 -o apt-2.12.0.tar    # on a machine with docker
+./prep.sh --configfile <your config file> --from apt-2.12.0.tar
+```
+
+or by hand:
+
+```bash
+singularity build apt-2.12.0.sif docker-archive://apt-2.12.0.tar
+```
+
+Note that Snakemake does **not** check that a local path exists when it builds
+the DAG, so a wrong path survives `--dry-run` and only fails when the first APT
+rule runs. Running `prep.sh` first avoids that class of surprise.
 
 If you omit `containers.apt`, the workflow falls back to the image used for our
 published runs. That repository is **private**, so the fallback will fail to

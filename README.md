@@ -46,15 +46,21 @@ APT is not open source: the 2.x downloads ship no source code, and the GPL terms
 
 APT is therefore **not covered by the licence for this repository, and cannot be redistributed with it**.
 To run the `apt`, `ps_metrics`, `ps_classification`, `otv_caller` and `make_vcf` rules you must obtain APT from ThermoFisher yourself, under your own acceptance of their terms, and build a container image using the [`Dockerfile`](containers/apt/Dockerfile) in `containers/apt/`.
-Then point the workflow at it with `containers.apt` in your config file:
+Point the workflow at the result with `containers.apt` in your config file, as either a registry reference or the path to a local Singularity image:
 
 ```yaml
 containers:
   apt: "docker://your-registry/apt:2.12.0"
 ```
 
-Because APT cannot be redistributed, that registry has to be one you control.
-See [`containers/apt/README.md`](containers/apt/README.md) for the build commands, and for how to use the image on a cluster that provides Singularity but not Docker.
+The [`prep.sh`](prep.sh) script does this for you — it builds the image, converts it for Singularity if needed, puts it where `containers.apt` points, and checks that APT runs inside it:
+
+```
+./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml
+```
+
+Because APT cannot be redistributed, any registry you use has to be one you control.
+See [preparing the APT container](docs/run.md#preparing-the-apt-container) for the options, including clusters such as NCI Gadi that provide Singularity but not Docker, and [`containers/apt/README.md`](containers/apt/README.md) for the licensing background.
 
 > Earlier revisions of this workflow pinned `docker://swarbricklab/ctp-tools:apt-2.10.2`, a public image that bundled the APT binaries.
 > That image is no longer public, because publishing it was not compatible with the EULA above.

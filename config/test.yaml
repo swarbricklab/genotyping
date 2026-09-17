@@ -5,6 +5,14 @@ deps:
   # Sample sheet. See README for column specifications
   donors: config/donors.csv
 
+# Container images
+containers:
+  # Image providing APT and SNPolisher. See config/template.yaml for the full
+  # explanation, and run ./prep.sh --configfile config/test.yaml to populate
+  # it. The value below is the private image used for our published runs, so
+  # replace it with your own before running the test.
+  apt: "docker://swarbricklab/ctp-tools:apt-2.10.2"
+
 # References
 refs:
   genomes:

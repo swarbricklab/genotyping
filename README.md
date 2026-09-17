@@ -45,7 +45,15 @@ The EULA grants a non-transferable licence, with no right to sublicense, to use 
 APT is not open source: the 2.x downloads ship no source code, and the GPL terms that search results often surface apply to the retired 1.x series.
 
 APT is therefore **not covered by the licence for this repository, and cannot be redistributed with it**.
-To run the `apt`, `ps_metrics`, `ps_classification`, `otv_caller` and `make_vcf` rules you must obtain APT from ThermoFisher yourself, under your own acceptance of their terms, and build a container image from the recipes in [`containers/apt/`](containers/apt/) -- see [`containers/apt/README.md`](containers/apt/README.md) for how to build it and point the rules at it.
+To run the `apt`, `ps_metrics`, `ps_classification`, `otv_caller` and `make_vcf` rules you must obtain APT from ThermoFisher yourself, under your own acceptance of their terms, and build a container image from the recipes in [`containers/apt/`](containers/apt/).
+Then point the workflow at it with `containers.apt` in your config file -- a registry reference or the path to a local `.sif`:
+
+```yaml
+containers:
+  apt: "containers/apt-2.12.0.sif"
+```
+
+See [`containers/apt/README.md`](containers/apt/README.md) for the build and conversion commands.
 
 > Earlier revisions of this workflow pinned `docker://swarbricklab/ctp-tools:apt-2.10.2`, a public image that bundled the APT binaries.
 > That image is no longer public, because publishing it was not compatible with the EULA above.

@@ -101,23 +101,29 @@ real version is recorded in the build log.
 
 ## Wiring it into the workflow
 
-The five rules in `workflow/rules/apt.smk` currently name a container image
-directly:
+Set `containers.apt` in your config file. It accepts either a registry
+reference or the path to a local `.sif`:
 
-```python
-container:
-    "docker://swarbricklab/ctp-tools:apt-2.10.2"
+```yaml
+containers:
+  apt: "containers/apt-2.12.0.sif"
 ```
 
-Until that is replaced with a configurable value, point the rules at your own
-build by editing those five lines — either to your own private registry
-reference, or to a local image. Snakemake accepts a path to a `.sif` file:
+That one value is used by all five APT rules (`apt`, `ps_metrics`,
+`ps_classification`, `otv_caller`, `make_vcf`).
 
-```python
-container:
-    "containers/apt-2.12.0.sif"
+If you built with docker and want singularity to run it, convert the image
+once:
+
+```bash
+docker save apt:2.12.0 -o apt-2.12.0.tar
+singularity build apt-2.12.0.sif docker-archive://apt-2.12.0.tar
 ```
 
-Making this a config key is tracked as follow-up work; it touches the dataset
-repos that consume this workflow as a module, so it is deliberately not bundled
-with this change.
+If you omit `containers.apt`, the workflow falls back to the image used for our
+published runs. That repository is **private**, so the fallback will fail to
+pull for anyone outside the lab — by design, since we cannot redistribute APT.
+The fallback exists so that existing dataset configs keep resolving to the
+exact image their results came from. If you see an authentication or
+"failed to get checksum" error from `singularity pull` on the first APT rule,
+you have not set `containers.apt`.

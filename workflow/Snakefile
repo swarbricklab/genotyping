@@ -10,6 +10,23 @@ psam=Path(config['outs']['psam'])
 id_map=Path(config['outs']['id_map'])
 out_dir=vcf_hg38.parent
 
+# Container image providing APT and SNPolisher for the rules in apt.smk.
+#
+# APT is proprietary and cannot be redistributed with this workflow, so the
+# image has to be supplied by whoever runs it. Build one with the recipes in
+# containers/apt/ and set containers.apt in the config file, either to a
+# registry reference or to the path of a local .sif file.
+#
+# The default below names the image used for our published runs. It is a
+# private registry repository, so it will not pull for anyone outside the lab
+# -- that is deliberate rather than an oversight. It is kept as the default so
+# that the config files of existing datasets keep resolving to the exact image
+# their results were produced with, and so that the provenance is recorded in
+# the code rather than only in prose.
+apt_container=config.get('containers', {}).get(
+    'apt', "docker://swarbricklab/ctp-tools:apt-2.10.2"
+)
+
 include: "rules/prep.smk"
 include: "rules/apt.smk"
 include: "rules/bcftools.smk"

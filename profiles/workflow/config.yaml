@@ -24,35 +24,35 @@ set-resources:
   apt:
     threads: 10
     mem: "32GB"
-    runtime: 60
+    runtime: 120
   make_vcf:
     mem: "12GB"
-    runtime: 20
+    runtime: 120
   otv_caller:
     threads: 20
     mem: "4GB"
-    runtime: 120
+    runtime: 720
   ps_metrics:
     threads: 10
     mem: "8GB"
-    runtime: 10
+    runtime: 25
   ps_classification:
     threads: 10
     mem: "8GB"
-    runtime: 20
+    runtime: 30
   format_vcf:
     threads: 1
     mem: "8GB"
-    runtime: 20
+    runtime: 60
   sort_vcf:
     threads: 1
     mem: "8GB"
-    runtime: 20
+    runtime: 60
   index_vcf:
     threads: 1
     mem: "8GB"
-    runtime: 10
+    runtime: 100
   liftover:
     threads: 1
     mem: "8GB"
-    runtime: 20
+    runtime: 120

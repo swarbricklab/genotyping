@@ -4,11 +4,11 @@ This repo is organised as [Snakemake](https://snakemake.readthedocs.io/en/v7.32.
 
 ## Environment
 
-A conda environment definition for Snakemake v7.32.4 and other dependencies can be found [here](env/snakemake_7.32.4.yaml).
+A conda environment definition for Snakemake v7.32.4 and other dependencies can be found [here](../env/snakemake_7.32.4.yaml).
 This environment is available as a global conda environment for project `a56` on NCI.
 For other platforms, create this environment as follows:
 ```
-conda env create -f envs/snakemake_7.32.4.yaml
+conda env create -f env/snakemake_7.32.4.yaml
 ```
 ([Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) first if necessary.)
 
@@ -16,13 +16,13 @@ conda env create -f envs/snakemake_7.32.4.yaml
 
 This workflow provides two [profiles](https://github.com/swarbricklab/snakemake_config?tab=readme-ov-file#profiles):
 1. a [global profile](https://github.com/swarbricklab/snakemake_config) for running the workflow under project `a56` on NCI. This profile is shared by all other workflows running on NCI.
-2. a [workflow profile](profiles/workflow/config.yaml) containing workflow-specific options, such as resource requirements per rule
+2. a [workflow profile](../profiles/workflow/config.yaml) containing workflow-specific options, such as resource requirements per rule
 
 The global profile can be modified for other platforms, or for other projects on NCI.
 
 ## Run script
 
-The workflow can be run as a module with [the following script](https://github.com/swarbricklab/genotyping/blob/main/run_mod.sh):
+The workflow can be run as a module with [the following script](../run_mod.sh):
 ```
 ./run_mod.sh
 ```
@@ -38,7 +38,7 @@ This can be useful if you need to provide extra resources (such as memory) to a 
 
 ## Running as part of a DVC super pipeline
 
-If this workflow has been [configured as a stage](https://github.com/swarbricklab/genotyping/blob/main/docs/configuration.md#dvc-pipeline) in a DVC pipeline, then it can be run as part of the overall pipeline with just
+If this workflow has been [configured as a stage](../config/README.md#dvc-pipeline) in a DVC pipeline, then it can be run as part of the overall pipeline with just
 ```
 dvc repro
 ```

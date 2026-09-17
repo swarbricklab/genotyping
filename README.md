@@ -32,7 +32,36 @@ See the individual rule definitions to understand the function of each rule.
 
 Further reading: [Axiom Genotyping Solution Data Analysis User Guide](https://assets.thermofisher.com/TFS-Assets/LSG/manuals/axiom_genotyping_solution_analysis_guide.pdf)
 
-## Configuration
+## Installation and use
 
-See the [configuration guide](config/README.md) for information on how to configure the workflow.
+- [Installation](docs/installation.md) -- installing this workflow as a git submodule
+- [Configuration](config/README.md) -- the config file and the sample sheet
+- [Running the workflow](docs/run.md) -- environment, profiles and the run scripts
+
+## Third-party software
+
+The genotyping rules call the [Analysis Power Tools](https://www.thermofisher.com/au/en/home/life-science/microarray-analysis/microarray-analysis-partners-programs/affymetrix-developers-network/affymetrix-power-tools.html) (APT) and SNPolisher, which are **proprietary software distributed by ThermoFisher Scientific under their own licence terms**.
+They are not covered by the licence for this repository, and this repository does not redistribute them.
+To run the workflow you must obtain APT from ThermoFisher and make it available to the `apt`, `ps_metrics`, `ps_classification`, `otv_caller` and `make_vcf` rules.
+
+The same applies to the array annotation files referenced under `refs.apt` in the config file (`Axiom_UKB_WCSG.*`), which must be downloaded from the relevant ThermoFisher [product page](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153).
+
+The remaining rules use openly licensed containers: [bcftools](https://github.com/samtools/bcftools) (MIT/Expat) and [samtools](https://github.com/samtools/samtools) (MIT/Expat) via [BioContainers](https://biocontainers.pro/), and the [bcftools +liftover](https://github.com/freeseek/score) plugin (MIT).
+
+## Test data
+
+The `.CEL` files under `test/` and the reference data under `resources/` are tracked with [DVC](https://dvc.org/) against a remote hosted on the NCI Gadi system, which is accessible only to members of project `a56`.
+The test `.CEL` files are SNP microarray measurements from human donors and are therefore potentially identifiable; they are **not** publicly redistributable.
+Researchers wishing to reproduce the test run should refer to the data availability statement of the associated publication.
+
+The workflow itself does not depend on this data -- it can be run on any set of Axiom `.CEL` files by pointing the config file at them.
+
+## Releases
+
+Projects using this workflow pin a specific revision of it as a git submodule, so that published results can always be traced back to the exact code that produced them.
+Revisions used for published analyses are tagged with a `paper/` prefix -- see the [tags](../../tags).
+
+## License
+
+This repository is released under the [MIT License](LICENSE), with the exception of the third-party software noted above.
 

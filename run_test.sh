@@ -6,7 +6,7 @@ conda activate snakemake_7.32.4
 
 if [[ "$(hostname)" == *"nci"* ]]; then
     echo "Running on NCI"
-    global_profile="--profile profiles/global/nci_a56"
+    global_profile="--profile profiles/global/nci"
     workflow_profile="--workflow-profile profiles/workflow "
     module load singularity
     mkdir -p logs/joblogs

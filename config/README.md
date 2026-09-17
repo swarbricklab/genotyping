@@ -1,8 +1,8 @@
 # Configuration
 
 Configuring the workflow involves editing two files:
-- config file (see [this template](config/template.yaml) for an example)
-- sample sheet (see [this example](config/donors.csv) used for testing)
+- config file (see [this template](template.yaml) for an example)
+- sample sheet (see [this example](donors.csv) used for testing)
 
 ### Config file
 
@@ -29,7 +29,7 @@ The sample sheet is a CSV file with the following columns:
 - array_type
 
 These column names are fixed, but additional columns can be added if desired.
-See [this example](config/donor.csv).
+See [this example](donors.csv).
 
 The meanings of each column are as follows:
 
@@ -41,4 +41,33 @@ The meanings of each column are as follows:
 
 Here 'UKB' refers to the [UK Biobank Array](https://www.thermofisher.com/order/catalog/product/902502),while 'PMDA' refers to the [Axiom Precision Medicine Diversity Array](https://www.thermofisher.com/order/catalog/product/951962?SID=srch-srp-951962).
 
-Make sure that the path to the sample sheet is specfied correctly in the config file.
+Make sure that the path to the sample sheet is specified correctly in the config file.
+
+### DVC pipeline
+
+To include this workflow as a stage in a [DVC](https://dvc.org/) pipeline, copy the stage definition from [the template](../.dvc/template.yaml) into the `stages:` block of the `dvc.yaml` file at the top of the super-project:
+
+```
+  genotyping:
+    cmd: ./modules/genotyping/run_mod.sh
+    deps:
+      - modules/genotyping/run_mod.sh
+      - modules/genotyping/workflow
+      - config/genotyping/config.yaml
+      - config/genotyping/donors.csv
+      - data/snp/microarray
+      - resources/genomes/hg19/hg19.fa.gz
+      - resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa
+      - resources/liftover/hg19ToHg38.over.chain.gz
+      - resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml
+      - resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps
+      - resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db
+    outs:
+      - data/snp/genotyping
+      - logs/snp/genotyping
+```
+
+The `deps` and `outs` must be kept in step with the `deps` and `outs` blocks of the config file.
+Note that `modules/genotyping/workflow` is listed as a dependency, so that DVC will re-run the stage if the workflow code changes.
+
+See [running the workflow](../docs/run.md#running-as-part-of-a-dvc-super-pipeline) for how to then run and freeze the stage.

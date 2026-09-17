@@ -1,0 +1,13 @@
+# Canonical author names and addresses.
+#
+# This maps the identities recorded in commits to preferred ones, so that
+# `git shortlog -sne`, `git log` and `git blame` credit each contributor once
+# and under a real address. It changes how authorship is displayed only --
+# no history is rewritten.
+#
+# Format: Proper Name <preferred@email> <email-as-recorded-in-commits>
+
+John Reeves <j.reeves@garvan.org.au> <johnyaku@users.noreply.github.com>
+Victor Liu <v.liu@garvan.org.au> <vliu378@aucklanduni.ac.nz>
+Sophie van der Leij <s.vanderleij@garvan.org.au> <sl6147@gadi-login-02.gadi.nci.org.au>
+James Douglas <j.douglas@garvan.org.au>

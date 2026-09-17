@@ -56,12 +56,10 @@ Researchers wishing to reproduce the test run should refer to the data availabil
 
 The workflow itself does not depend on this data -- it can be run on any set of Axiom `.CEL` files by pointing the config file at them.
 
-## Citation
+## Releases
 
-TODO: add the citation for the associated publication once it is available.
-
-The exact revision of this workflow used to generate the genotyping results for that publication is tagged [`paper/brca-mega-atlas`](../../tree/paper/brca-mega-atlas), and is pinned as a submodule at `modules/genotyping` in the accompanying data repository.
-The workflow logic (`workflow/Snakefile` and `workflow/rules/*.smk`) at that tag is identical to the tagged release on `main`; the two differ only in documentation and in the per-rule cluster resource requests.
+Projects using this workflow pin a specific revision of it as a git submodule, so that published results can always be traced back to the exact code that produced them.
+Revisions used for published analyses are tagged with a `paper/` prefix -- see the [tags](../../tags).
 
 ## License
 

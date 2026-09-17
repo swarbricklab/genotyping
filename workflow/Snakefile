@@ -15,6 +15,20 @@ include: "rules/apt.smk"
 include: "rules/bcftools.smk"
 include: "rules/psam.smk"
 
+# Rules that are too small to be worth a scheduler round-trip: each handles at
+# most a few thousand rows, or a file of a few hundred KB. Running them in the
+# Snakemake process avoids a queue wait per rule.
+# Note that none of these declare a container, so they do not need singularity
+# on the submit host. Every rule that does real work (prepare_hg19 onwards)
+# declares one and stays on the cluster.
+localrules:
+    map_donors,
+    list_cel_files,
+    prepare_int_fai,
+    prepare_chromosome_maps,
+    prepare_chain,
+    make_psam,
+
 rule all:
     input:
         vcf_hg19,

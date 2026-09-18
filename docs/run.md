@@ -131,7 +131,9 @@ To run the workflow standalone against the test dataset, from the top of this re
 [`run_test.sh`](../run_test.sh) is the same wrapper as `run_mod.sh` but points at `workflow/Snakefile` and [`config/test.yaml`](../config/test.yaml) in place of the submodule paths, and it too passes on any snakemake options — so `./run_test.sh --dry-run` works.
 Outputs land in `test/results/`.
 
-The `apt` and `otv_caller` rules dominate the runtime; expect on the order of an hour on Gadi for these four samples, most of it in `otv_caller`, whose cost is driven by the number of probesets rather than the number of samples.
+A full run on Gadi took 57 minutes of wall clock for these four samples, of which roughly half was queue wait.
+`otv_caller` is the longest rule at about 22 minutes, followed by `make_vcf` at 6 and `apt` at 3.
+Adding samples costs little: `otv_caller`'s and `make_vcf`'s work is driven by the number of probesets, not the number of samples.
 
 ## Running as part of a DVC super pipeline
 

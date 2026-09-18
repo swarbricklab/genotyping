@@ -1,0 +1,20 @@
+# Checksums for the test CEL files, after decompression.
+#
+# Source: GEO series GSE224950 (platform GPL33111, Axiom_UKB_WCSG), deposited by
+# the Powell lab at the Garvan Institute for Neavin et al. 2023 (PMID 37296104).
+# The series has twenty hiPSC lines; these four are the subset used for the test,
+# picked to cover both sexes so the sex calls in the .psam are exercised.
+#
+#   GSM7036154  iPSC_166       Female
+#   GSM7036155  iPSC_180N      Female
+#   GSM7036159  iPSC_IST3323   Male
+#   GSM7036160  iPSC_MBE0953   Male
+#
+# GEO serves these gzipped and replaces supplementary files in place without
+# changing the accession, so these are checksums of what GEO served on
+# 2026-09-18 rather than anything the depositors or NCBI publish. A mismatch
+# means the deposit has changed, not necessarily that the download is corrupt.
+f7502370e54675ae2543618295c09c70c1e8e8863a0e6cd92f34f001e95c3db8  GSM7036154_166.CEL
+27f36246603241de0d23666135b0bb1f9eb4ce60df9b47454b092a40a325b322  GSM7036155_180N.CEL
+e117f16c07cb891eafc99d617d733ae4e996ace2f8446021cb45f05e10cd9728  GSM7036159_IST3323.CEL
+9f610b45f30e867ea8b1da1350a395dea8dea45782c5875c7eee70d3f24dee8a  GSM7036160_MBE0953.CEL

@@ -20,7 +20,7 @@ The workflow also creates a `.psam` file, ready for use with `plink`.
 The donor IDs in this `.psam` file are reformatted (if necessary) by replacing hyphens with underscores, so `id_map.tsv` is provided for switching back and forth between the original and reformatted donor IDs.
 
 This workflow uses the [Analysis Power Tools](https://www.thermofisher.com/au/en/home/life-science/microarray-analysis/microarray-analysis-partners-programs/affymetrix-developers-network/affymetrix-power-tools.html) (APT) by ThermoFisher Scientific.
-Annotation of the VCF file is based on [this annotation reference](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153) (also by ThermoFisher Scientific), which in turn is based on the `hg19` assembly of the human genome. 
+Annotation of the VCF file is based on the NetAffx annotation for the [Axiom UK Biobank array](https://www.thermofisher.com/order/catalog/product/902502) (also by ThermoFisher Scientific), which in turn is based on the `hg19` assembly of the human genome. 
 This worklow formats the VCF file by adding header contigs for `hg19` and reformatting the chomosome names from 1, 2, 3, ... to chr1, chr2, chr3, ...
 Finally, the formatted `hg19` VCF file is lifted over to the `hg38` assembly.
 
@@ -70,8 +70,17 @@ Note that the version recorded in that image tag was not accurate: `apt-genotype
 Genotypes are called by `apt-genotype-axiom`, so **2.10.0** is the version to quote for the calling step.
 ThermoFisher still publishes 2.10.0, at a different URL from the current release; `prep.sh --apt-version 2.10.0` builds an image that reproduces the calling step, while the default builds the current 2.12.0. See [`containers/apt/README.md`](containers/apt/README.md#versions).
 
-The array annotation files referenced under `refs.apt` in the config file (`Axiom_UKB_WCSG.*`) are vendor-supplied and likewise cannot be redistributed here.
-They must be downloaded from the relevant ThermoFisher [product page](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153).
+The array library and annotation files referenced under `refs.apt` in the config file (`Axiom_UKB_WCSG.*`) are vendor-supplied and likewise cannot be redistributed here.
+ThermoFisher reserves all rights in them, and they are not covered by the APT EULA, which applies only to the software.
+`prep.sh` downloads them for you and checks them against recorded checksums:
+
+```
+./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml --what resources
+```
+
+Note that the config file names three of these files, but APT reads ten: the arg file is an XML document that references seven further library files by bare filename, which APT resolves against the directory the arg file lives in.
+They therefore all have to be downloaded into that one directory.
+See [fetching the Axiom array files](docs/run.md#fetching-the-axiom-array-files).
 
 The remaining rules use openly licensed containers: [bcftools](https://github.com/samtools/bcftools) (MIT/Expat) and [samtools](https://github.com/samtools/samtools) (MIT/Expat) via [BioContainers](https://biocontainers.pro/), and the [bcftools +liftover](https://github.com/freeseek/score) plugin (MIT).
 

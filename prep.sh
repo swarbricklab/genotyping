@@ -323,7 +323,7 @@ Downloading Axiom UK Biobank (Axiom_UKB_WCSG) release r5 library files and the
 na35 annotation database into $resources_dir
 
 These are supplied by Thermo Fisher. They are not redistributable, so they are
-fetched from the vendor rather than shipped with this workflow. About 480 MB of
+fetched from the vendor rather than shipped with this workflow. About 325 MB of
 downloads expanding to roughly 2.5 GB, most of it the annotation database.
 
 EOF

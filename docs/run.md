@@ -60,7 +60,7 @@ These are vendor-supplied and not redistributable, so they are fetched from Ther
 ./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml --what resources
 ```
 This downloads release `r5` of the Axiom UK Biobank (`Axiom_UKB_WCSG`) library files and the `na35` annotation database into the directory holding `refs.apt.arg_file`, then verifies them against [`resources/axiom_ukb_wcsg_r5.sha256`](../resources/axiom_ukb_wcsg_r5.sha256).
-About 480 MB of downloads expanding to roughly 2.5 GB, most of it the annotation database.
+About 325 MB of downloads expanding to roughly 2.5 GB, most of it the annotation database.
 Re-running is a no-op once the files are present and match.
 
 Use `--what all` to do this and the container in one go.

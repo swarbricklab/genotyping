@@ -12,7 +12,8 @@
 #   --what STAGE        What to prepare: container, resources, testdata, or all.
 #                       Default: container.
 #   --configfile PATH   Config file to read paths from. Required unless the
-#                       relevant --target/--resources-dir is given.
+#                       relevant --target/--resources-dir is given. The
+#                       testdata stage never reads it.
 #   --force             Redo work even if the outputs already look complete.
 #
 # container stage:
@@ -86,7 +87,7 @@ while [[ $# -gt 0 ]]; do
         --array)          array="${2:-}"; shift 2 ;;
         --testdata-dir)   testdata_dir="${2:-}"; shift 2 ;;
         --force)          force="true"; shift ;;
-        -h|--help)        sed -n '3,50p' "${BASH_SOURCE[0]}" | cut -c 3-; exit 0 ;;
+        -h|--help)        sed -n '3,51p' "${BASH_SOURCE[0]}" | cut -c 3-; exit 0 ;;
         *)                die "unknown argument: $1" ;;
     esac
 done

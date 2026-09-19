@@ -1,0 +1,13 @@
+md5: d951544ffbed9e49b8f8b119963ce47a
+frozen: true
+deps:
+- checksum: '"2640140-59127974225c0"'
+  size: 40108352
+  hash: md5
+  path: 
+    https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.11.fa.gz
+outs:
+- md5: 8cd66df217b4e872a65525db39a9b702
+  size: 40108352
+  hash: md5
+  path: Homo_sapiens.GRCh38.dna.chromosome.11.fa.gz

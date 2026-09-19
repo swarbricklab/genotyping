@@ -1,0 +1,13 @@
+md5: c01a5c15cee51918bdaf8f9e8b67997f
+frozen: true
+deps:
+- checksum: '"421077c-5912655c03d40"'
+  size: 69273468
+  hash: md5
+  path: 
+    https://ftp.ensembl.org/pub/release-98/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz
+outs:
+- md5: 6f157cbdaed6fcc811dfdef69f22b505
+  size: 69273468
+  hash: md5
+  path: Homo_sapiens.GRCh38.dna.chromosome.1.fa.gz

@@ -34,7 +34,8 @@ rule liftover:
         chr_map=rules.prepare_chromosome_maps.output.chr_map,
         chain=rules.prepare_chain.output.chain,
         src_fa=rules.prepare_hg19.output.fa,
-        target_fa=config['refs']['genomes']['hg38']
+        target_fa=rules.prepare_hg38.output.fa,
+        target_fai=rules.prepare_hg38.output.fai
     output:
         vcf_hg38=temp(out_dir/"liftover/combined.hg38.vcf")
     container:

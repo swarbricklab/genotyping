@@ -68,7 +68,7 @@ See [preparing the APT container](docs/run.md#preparing-the-apt-container) for t
 
 Note that the version recorded in that image tag was not accurate: `apt-genotype-axiom` in it reports **2.10.0**, while the SNPolisher tools report 2.10.2.
 Genotypes are called by `apt-genotype-axiom`, so **2.10.0** is the version to quote for the calling step.
-ThermoFisher publishes only the current release, so 2.10.x can no longer be downloaded; the `Dockerfile` in `containers/apt/` defaults to 2.12.0 and does **not** reproduce the original run.
+ThermoFisher still publishes 2.10.0, at a different URL from the current release; `prep.sh --apt-version 2.10.0` builds an image that reproduces the calling step, while the default builds the current 2.12.0. See [`containers/apt/README.md`](containers/apt/README.md#versions).
 
 The array annotation files referenced under `refs.apt` in the config file (`Axiom_UKB_WCSG.*`) are vendor-supplied and likewise cannot be redistributed here.
 They must be downloaded from the relevant ThermoFisher [product page](https://www.thermofisher.com/order/catalog/product/901153?SID=srch-srp-901153).

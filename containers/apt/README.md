@@ -40,13 +40,31 @@ comes from.
 
 ## Versions
 
-Thermo Fisher publishes **only the current release**. At the time of writing
-that is 2.12.0, which is the default here.
+The default is 2.12.0, the current release.
 
-> **The manuscript run used APT 2.10.0, which can no longer be downloaded.**
-> Building from this Dockerfile gives you 2.12.0, not a reproduction of that
-> run. There is no way to rebuild 2.10.x from a Thermo Fisher URL; if you need
-> it, you need an archived copy of the original zip.
+**The manuscript run used APT 2.10.0, and it is still downloadable** — Thermo
+Fisher keeps older releases at a different path from the current one, so the URL
+is not a predictable function of the version. `prep.sh` knows the URL and
+checksum for both 2.12.0 and 2.10.0:
+
+```bash
+./prep.sh --configfile <your config file> --apt-version 2.10.0
+```
+
+To build it by hand, all three build-args have to be given together, because
+the URL cannot be derived from the version:
+
+```bash
+docker build -t apt:2.10.0 \
+  --build-arg APT_VERSION=2.10.0 \
+  --build-arg APT_URL=https://downloads.thermofisher.com/Affymetrix_Softwares/APT_2.10.0/apt-2.10.0-x86_64-intel-linux.zip \
+  --build-arg APT_SHA256=c5503f95c1c773a319562cac170d24f1e771be7fec39b88f3f72734c9952f9d9 \
+  containers/apt
+```
+
+The 2.10.0 archive nests its `bin/`, EULA and `licenses/` under a top-level
+directory, where 2.12.0 has them at the archive root; the Dockerfile detects
+either layout, so no other change is needed to switch versions.
 
 Some history worth knowing, since it affects how you read the methods:
 
@@ -79,11 +97,13 @@ hand.
 docker build -t apt:2.12.0 containers/apt
 ```
 
-To pin a different version, override both the version and its checksum:
+To pin a version other than the two above, override the version, its URL and
+its checksum together (the URL is not derivable from the version):
 
 ```bash
 docker build -t apt:2.11.6 \
   --build-arg APT_VERSION=2.11.6 \
+  --build-arg APT_URL=<download URL for that archive> \
   --build-arg APT_SHA256=<sha256 of that archive> \
   containers/apt
 ```

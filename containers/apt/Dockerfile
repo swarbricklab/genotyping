@@ -28,11 +28,18 @@
 #
 # VERSION
 #
-# Thermo Fisher publishes only the current release. At the time of writing
-# that is 2.12.0, so it is the default here. The manuscript run used APT
-# 2.10.0 (see the README), which Thermo Fisher no longer distributes and
-# which therefore cannot be rebuilt from this file. Pass --build-arg to pin a
-# different version if you have a URL for it.
+# The default is APT 2.12.0, the current release. To build a different
+# version, override APT_VERSION, APT_URL and APT_SHA256 together: the download
+# URL is not a predictable function of the version, so the version alone is not
+# enough. prep.sh --apt-version knows the URLs for the versions we have used.
+#
+# The manuscript run used APT 2.10.0. Thermo Fisher still publishes it, at a
+# different path from the current release (see APT_URL below and the README);
+# it can be rebuilt from this file.
+#
+# The extraction copes with either archive layout: 2.12.0 unpacks bin/, the
+# EULA and licenses/ at the archive root, while 2.10.0 nests them under a
+# single top-level directory.
 #
 # USAGE
 #
@@ -45,26 +52,39 @@ ARG APT_VERSION=2.12.0
 
 # ---------------------------------------------------------------------------
 # Fetch and verify. Kept in a separate stage so that curl, unzip and the
-# 205 MB archive do not end up as layers in the final image.
+# ~200 MB archive do not end up as layers in the final image.
 # ---------------------------------------------------------------------------
 FROM debian:bookworm-slim AS fetch
 
 ARG APT_VERSION
 ARG APT_URL=https://downloads.thermofisher.com/APT/APT_${APT_VERSION}/apt_${APT_VERSION}_linux_64_x86_binaries.zip
 # sha256 of apt_2.12.0_linux_64_x86_binaries.zip (205,220,602 bytes), verified
-# against the published download. Override together with APT_VERSION.
+# against the published download. Override together with APT_VERSION and
+# APT_URL. For 2.10.0 it is
+# c5503f95c1c773a319562cac170d24f1e771be7fec39b88f3f72734c9952f9d9.
 ARG APT_SHA256=d715adbc0a14df71e42f14bf250d3c39718d7a6712e8b8b2127192715196bafe
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl unzip \
  && rm -rf /var/lib/apt/lists/*
 
-# Fail the build rather than bake in an unverified archive.
+# Fail the build rather than bake in an unverified archive. The known archive
+# layouts differ (see VERSION above), so unpack to a scratch directory and
+# locate the directory that actually contains bin/ -- that is the APT root,
+# whether it sits at the archive root (2.12.0) or one level down (2.10.0). The
+# EULA is normalised to a single name (2.10.0 ships EULA.DOCX, 2.12.0
+# EULA.docx) so the final stage can COPY it by a fixed path.
 RUN curl -fsSL -o /tmp/apt.zip "${APT_URL}" \
  && printf '%s  /tmp/apt.zip\n' "${APT_SHA256}" | sha256sum -c - \
- && mkdir -p /opt/apt \
- && unzip -q /tmp/apt.zip -d /opt/apt \
+ && unzip -q /tmp/apt.zip -d /tmp/unpack \
  && rm /tmp/apt.zip \
+ && if [ -d /tmp/unpack/bin ]; then aptroot=/tmp/unpack; \
+    else aptroot="$(dirname "$(find /tmp/unpack -mindepth 2 -maxdepth 2 -type d -name bin | head -1)")"; fi \
+ && mkdir -p /opt/apt \
+ && cp -a "$aptroot/bin" /opt/apt/bin \
+ && cp -a "$aptroot/licenses" /opt/apt/licenses \
+ && cp -a "$aptroot"/EULA.[dD][oO][cC][xX] /opt/apt/EULA.docx \
+ && rm -rf /tmp/unpack \
  && chmod +x /opt/apt/bin/*
 
 # ---------------------------------------------------------------------------

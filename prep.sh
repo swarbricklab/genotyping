@@ -19,8 +19,14 @@
 #                         dockerfile          build containers/apt (needs docker)
 #                       Default: dockerfile.
 #   --apt-version VER   APT version to build (default 2.12.0). dockerfile only.
-#   --apt-sha256 SUM    Checksum for that version. Required if --apt-version is
-#                       given, since the recorded default only matches 2.12.0.
+#                       prep.sh already knows the download URL and checksum for
+#                       2.12.0 and for the manuscript's 2.10.0, so either builds
+#                       with just this flag. For any other version also give
+#                       --apt-url and --apt-sha256.
+#   --apt-url URL       Download URL for that version's Linux x86 zip. Needed
+#                       only for a version prep.sh does not already know: the URL
+#                       is not derivable from the version number.
+#   --apt-sha256 SUM    Expected sha256 of that zip. As for --apt-url.
 #   --force             Rebuild even if the target already exists.
 #
 # Paths are interpreted relative to the current directory, which is how
@@ -33,6 +39,7 @@ configfile=""
 target=""
 source_spec="dockerfile"
 apt_version=""
+apt_url=""
 apt_sha256=""
 force="false"
 
@@ -49,15 +56,32 @@ while [[ $# -gt 0 ]]; do
         --target)      target="${2:-}"; shift 2 ;;
         --from)        source_spec="${2:-}"; shift 2 ;;
         --apt-version) apt_version="${2:-}"; shift 2 ;;
+        --apt-url)     apt_url="${2:-}"; shift 2 ;;
         --apt-sha256)  apt_sha256="${2:-}"; shift 2 ;;
         --force)       force="true"; shift ;;
-        -h|--help)     sed -n '3,28p' "${BASH_SOURCE[0]}" | cut -c 3-; exit 0 ;;
+        -h|--help)     sed -n '3,34p' "${BASH_SOURCE[0]}" | cut -c 3-; exit 0 ;;
         *)             die "unknown argument: $1" ;;
     esac
 done
 
-if [[ -n "$apt_version" && -z "$apt_sha256" ]]; then
-    die "--apt-version requires --apt-sha256: the checksum recorded in the Dockerfile only matches its default version."
+# Resolve the download URL and checksum for a requested version. The URL is not
+# a predictable function of the version -- Thermo Fisher keeps older releases at
+# a different path -- so the versions we have built are recorded here rather
+# than derived. With no version flag we pass nothing and let the Dockerfile use
+# its own default; that keeps a single source of truth for the default version.
+if [[ -n "$apt_version" || -n "$apt_url" ]]; then
+    case "${apt_version:-2.12.0}" in
+        2.12.0)
+            apt_url="${apt_url:-https://downloads.thermofisher.com/APT/APT_2.12.0/apt_2.12.0_linux_64_x86_binaries.zip}"
+            apt_sha256="${apt_sha256:-d715adbc0a14df71e42f14bf250d3c39718d7a6712e8b8b2127192715196bafe}"
+            ;;
+        2.10.0)
+            apt_url="${apt_url:-https://downloads.thermofisher.com/Affymetrix_Softwares/APT_2.10.0/apt-2.10.0-x86_64-intel-linux.zip}"
+            apt_sha256="${apt_sha256:-c5503f95c1c773a319562cac170d24f1e771be7fec39b88f3f72734c9952f9d9}"
+            ;;
+    esac
+    [[ -n "$apt_url"    ]] || die "APT ${apt_version} is not a version prep.sh has a URL for; give --apt-url as well (see containers/apt/README.md)."
+    [[ -n "$apt_sha256" ]] || die "APT ${apt_version} needs its checksum; give --apt-sha256 as well (see containers/apt/README.md)."
 fi
 
 if [[ "$(hostname)" == *"nci"* ]]; then
@@ -162,8 +186,9 @@ EOF
 
         tag="apt:${apt_version:-2.12.0}"
         build_args=()
-        if [[ -n "$apt_version" ]]; then
-            build_args+=(--build-arg "APT_VERSION=$apt_version")
+        if [[ -n "$apt_version" || -n "$apt_url" ]]; then
+            build_args+=(--build-arg "APT_VERSION=${apt_version:-2.12.0}")
+            build_args+=(--build-arg "APT_URL=$apt_url")
             build_args+=(--build-arg "APT_SHA256=$apt_sha256")
         fi
 

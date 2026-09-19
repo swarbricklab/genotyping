@@ -39,8 +39,9 @@ containers:
   #
   # The value below is the image used for our published runs. It is a private
   # registry repository and will not pull without credentials, so replace it.
-  # Note that it contains apt-genotype-axiom 2.10.0, which ThermoFisher no
-  # longer distributes, so a locally built image will not be identical to it.
+  # Note that it contains apt-genotype-axiom 2.10.0. ThermoFisher still
+  # publishes 2.10.0, so `prep.sh --apt-version 2.10.0` builds an image that
+  # reproduces the calling step (see containers/apt/README.md).
   apt: "docker://swarbricklab/ctp-tools:apt-2.10.2"
 
 # References

@@ -82,7 +82,7 @@ To include this workflow as a stage in a [DVC](https://dvc.org/) pipeline, copy 
       - config/genotyping/donors.csv
       - data/snp/microarray
       - resources/genomes/hg19/hg19.fa.gz
-      - resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa
+      - resources/genomes/GRCh38
       - resources/liftover/hg19ToHg38.over.chain.gz
       - resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml
       - resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps

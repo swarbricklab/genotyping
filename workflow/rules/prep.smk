@@ -50,6 +50,46 @@ rule prepare_hg19:
         samtools faidx {output.fa}
         """
 
+# Ensembl release-98 main chromosomes, listed in the same order as the 10x
+# GRCh38-2020-A reference (numerics sorted lexically, then MT, X, Y). Building
+# the reference in this order keeps the liftover output's contig order -- and
+# so the whole VCF body -- unchanged from the published runs.
+GRCH38_CHR_ORDER = ["1", "10", "11", "12", "13", "14", "15", "16", "17", "18",
+                    "19", "2", "20", "21", "22", "3", "4", "5", "6", "7", "8",
+                    "9", "MT", "X", "Y"]
+
+rule prepare_hg38:
+    """
+    Builds the hg38 (GRCh38) reference from Ensembl release-98 per-chromosome
+    FASTAs: rewrites each header to the chr-prefixed name the liftover chain
+    uses (MT -> chrM), concatenates them in the 10x GRCh38-2020-A order, and
+    indexes the result. The sequence is byte-identical to the 10x reference's
+    main chromosomes; only the empty scaffolds are omitted.
+    """
+    input:
+        src=expand(
+            config['refs']['genomes']['hg38_chromosomes']
+                + "/Homo_sapiens.GRCh38.dna.chromosome.{c}.fa.gz",
+            c=GRCH38_CHR_ORDER,
+        )
+    output:
+        fa=temp(out_dir/"genomes/GRCh38.fa"),
+        fai=temp(out_dir/"genomes/GRCh38.fa.fai")
+    container:
+        "docker://quay.io/biocontainers/samtools:1.21--h50ea8bc_0"
+    log:
+        logs/"prepare_hg38.log"
+    shell:
+        r"""
+        : > {output.fa}
+        for f in {input.src}; do
+            n=$(basename "$f" .fa.gz); n=${{n##*.chromosome.}}
+            if [ "$n" = MT ]; then c=chrM; else c=chr$n; fi
+            zcat "$f" | awk -v h=">$c $n" 'NR==1{{print h; next}} {{print}}' >> {output.fa}
+        done
+        samtools faidx {output.fa} 2> {log}
+        """
+
 rule prepare_int_fai:
     input:
         fai=rules.prepare_hg19.output.fai

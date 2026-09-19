@@ -86,6 +86,55 @@ See [fetching the Axiom array files](docs/run.md#fetching-the-axiom-array-files)
 
 The remaining rules use openly licensed containers: [bcftools](https://github.com/samtools/bcftools) (MIT/Expat) and [samtools](https://github.com/samtools/samtools) (MIT/Expat) via [BioContainers](https://biocontainers.pro/), and the [bcftools +liftover](https://github.com/freeseek/score) plugin (MIT).
 
+## Tools, references and citations
+
+This section records the provenance a citing manuscript needs. Full citations, with DOIs/PMIDs, and how to cite tools that have no dedicated paper (APT, SNPolisher) are in [docs/prior-art.md](docs/prior-art.md#how-to-cite-the-dependencies).
+
+### Platform
+
+| Item | Value | Source |
+|---|---|---|
+| Array | Applied Biosystems™ UK Biobank Axiom™ Array (`Axiom_UKB_WCSG`) | CEL headers (`affymetrix-array-type`) |
+| Array design citation | Bycroft C, et al. *Nature* 2018;562:203–209. doi:10.1038/s41586-018-0579-z | |
+| Library package | `Axiom_UKB_WCSG` **r5** | `refs.apt` filenames |
+| Annotation build | **na35** (GRCh37/hg19) | `Axiom_UKB_WCSG.na35.annot.db` |
+| Genotyping facility | Ramaciotti Centre for Genomics, UNSW Sydney | service records |
+
+### Tools
+
+| Tool | Version | Container | Role |
+|---|---|---|---|
+| Analysis Power Tools (APT) | `apt-genotype-axiom` **2.10.0** (calling); `ps-metrics`/`ps-classification` 2.10.2; `apt-format-result` 2.10.2.2 | `swarbricklab/ctp-tools:apt-2.10.2` (private; a version mix — see [containers/apt/README.md](containers/apt/README.md#versions)) | genotype calling, metrics, classification, OTV, VCF export |
+| SNPolisher | bundled in the APT image | as above | probeset classification |
+| bcftools | 1.21 | `quay.io/biocontainers/bcftools:1.21--h8b25389_0` | VCF formatting |
+| bcftools `+liftover` | bcftools 1.18 + [liftover plugin](https://github.com/freeseek/score) | `yangyxt/bcftools_liftover:1.18` | hg19 → hg38 liftover |
+| samtools | 1.21 | `quay.io/biocontainers/samtools:1.21--h50ea8bc_0` | FASTA indexing |
+| Snakemake | 7.32.4 | conda ([`env/snakemake_7.32.4.yaml`](env/snakemake_7.32.4.yaml)) | workflow engine |
+
+Genotypes are called by `apt-genotype-axiom`, so **2.10.0** is the version to quote for the calling step. See [containers/apt/README.md](containers/apt/README.md#versions) for how to build a container pinned to that version.
+
+### Reference data
+
+| Reference | Build | How it is obtained |
+|---|---|---|
+| hg19 FASTA | UCSC hg19 | `dvc import-url` (UCSC goldenPath) |
+| hg38 FASTA | GRCh38, Ensembl release-98 (main chromosomes) | 25 `dvc import-url` stages + the `prepare_hg38` rule |
+| liftover chain | UCSC hg19ToHg38 | `dvc import-url` (UCSC gbdb) |
+| Axiom library | `Axiom_UKB_WCSG` r5 | Thermo Fisher (`prep.sh --what resources`) |
+| Axiom annotation | na35 | Thermo Fisher |
+
+### Citing this workflow
+
+A [`CITATION.cff`](CITATION.cff) at the repository root provides citation metadata, which GitHub surfaces via *Cite this repository*.
+
+To mint a DOI for the archived workflow (once the repository is public):
+
+1. Enable the repository at [zenodo.org](https://zenodo.org) → *GitHub* (Zenodo only sees public repositories).
+2. Create a GitHub release (e.g. `v1.0.0`); Zenodo archives it and mints a version DOI plus a version-independent *concept* DOI.
+3. Add the concept DOI to `CITATION.cff` (uncomment the `identifiers` block).
+
+Known caveats of the workflow's output are documented in [docs/limitations.md](docs/limitations.md).
+
 ## Test data
 
 The test dataset is four human induced pluripotent stem cell lines from [GEO series GSE224950](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224950), run on the same Axiom UK Biobank array as our own data and deposited by the Powell lab at the Garvan Institute for [Neavin et al. 2023](https://pubmed.ncbi.nlm.nih.gov/37296104/).

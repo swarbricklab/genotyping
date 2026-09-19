@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use this workflow, please cite it using the metadata below."
+title: "genotyping: an Axiom SNP microarray CEL-to-VCF Snakemake workflow"
+abstract: >-
+  A Snakemake workflow that converts Applied Biosystems / Thermo Fisher Axiom
+  SNP microarray .CEL files into annotated VCF files (hg19 and lifted over to
+  hg38), by driving Analysis Power Tools (APT) and SNPolisher through the Axiom
+  Best Practices workflow. Intended for genotyping donors so that pooled
+  single-cell RNA-seq data can be demultiplexed.
+type: software
+authors:
+  - given-names: John
+    family-names: Reeves
+    affiliation: "Garvan Institute of Medical Research"
+    email: j.reeves@garvan.org.au
+    alias: johnyaku
+    # orcid: "https://orcid.org/0000-0000-0000-0000"   # TODO: add ORCID
+  # TODO: confirm and complete the author list before release.
+  # The workflow's lineage (see the "Authors" section of README.md) also
+  # involves @nbartonicek (original bash/SGE scripts) and @dlroden and
+  # @BeataKiedik (souporcell / demuxafy refactors). Add whichever should be
+  # credited as software authors, each with given-names / family-names and
+  # ideally an orcid, in the agreed order.
+repository-code: "https://github.com/swarbricklab/genotyping"
+url: "https://github.com/swarbricklab/genotyping"
+license: MIT
+version: "1.0.0"            # TODO: set to the released tag
+date-released: "2026-09-20" # TODO: set to the release date
+# After archiving a release on Zenodo (see docs/run.md), add the DOI here so
+# that GitHub's "Cite this repository" widget and downstream tools pick it up:
+# identifiers:
+#   - type: doi
+#     value: "10.5281/zenodo.XXXXXXX"
+#     description: "Concept DOI (all versions)"
+keywords:
+  - Axiom
+  - "UK Biobank array"
+  - "SNP microarray"
+  - genotyping
+  - Snakemake
+  - VCF
+  - "Analysis Power Tools"

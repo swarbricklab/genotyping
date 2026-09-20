@@ -51,11 +51,13 @@ checksum for both 2.12.0 and 2.10.0:
 ./prep.sh --configfile <your config file> --apt-version 2.10.0
 ```
 
-To build it by hand, all three build-args have to be given together, because
-the URL cannot be derived from the version:
+To build it by hand, all three build-args have to be given together (the URL
+cannot be derived from the version), plus the EULA acceptance (see Building
+below); or just use `build.sh --apt-version 2.10.0`:
 
 ```bash
 docker build -t apt:2.10.0 \
+  --build-arg ACCEPT_THERMOFISHER_EULA=yes \
   --build-arg APT_VERSION=2.10.0 \
   --build-arg APT_URL=https://downloads.thermofisher.com/Affymetrix_Softwares/APT_2.10.0/apt-2.10.0-x86_64-intel-linux.zip \
   --build-arg APT_SHA256=c5503f95c1c773a319562cac170d24f1e771be7fec39b88f3f72734c9952f9d9 \
@@ -82,30 +84,59 @@ So when quoting a version, say which binary you mean. Genotypes are called by
 
 ## Building
 
-The easiest route is [`prep.sh`](../../prep.sh), which builds the image, converts
-it for Singularity if needed, and places it wherever `containers.apt` points:
+### Accepting the EULA
+
+Because building downloads APT from Thermo Fisher under their EULA, the build
+**fails unless you confirm you accept it** by passing
+`--build-arg ACCEPT_THERMOFISHER_EULA=yes`. This is a deliberate gate: it makes
+acceptance a conscious act, so no one bundles APT by accident. By setting it you
+confirm you have read and accept the EULA and take responsibility for your own
+relationship with Thermo Fisher.
+
+### With build.sh (recommended for a laptop)
+
+[`build.sh`](build.sh) prompts you to accept the EULA, then builds and saves a
+tarball ready to copy to the machine that runs the workflow. On an
+Apple-Silicon Mac it sets `--platform linux/amd64` for you (the APT binaries are
+x86-64, so a native arm64 build would not run):
 
 ```bash
-./prep.sh --configfile <your config file>
+./containers/apt/build.sh                     # defaults to 2.12.0
+./containers/apt/build.sh --apt-version 2.10.0   # the manuscript version
+```
+
+This writes `apt-<version>.tar`; copy it across and place it with
+`./prep.sh --from apt-<version>.tar --configfile <your config file>`.
+
+### With prep.sh
+
+[`prep.sh`](../../prep.sh) builds the image, converts it for Singularity if
+needed, and places it wherever `containers.apt` points. It prompts for EULA
+acceptance (or pass `--accept-eula`):
+
+```bash
+./prep.sh --configfile <your config file> --accept-eula
 ```
 
 It is idempotent, and it verifies that APT actually runs inside the image before
-putting it in place. The rest of this section covers doing the same steps by
-hand.
+putting it in place.
+
+### By hand
 
 ```bash
-docker build -t apt:2.12.0 containers/apt
+docker build --build-arg ACCEPT_THERMOFISHER_EULA=yes -t apt:2.12.0 containers/apt
 ```
 
-To pin a version other than the two above, override the version, its URL and
-its checksum together (the URL is not derivable from the version):
+To pin a version other than the two prep.sh knows, override the version, its URL
+and its checksum together (the URL is not derivable from the version):
 
 ```bash
-docker build -t apt:2.11.6 \
+docker build \
+  --build-arg ACCEPT_THERMOFISHER_EULA=yes \
   --build-arg APT_VERSION=2.11.6 \
   --build-arg APT_URL=<download URL for that archive> \
   --build-arg APT_SHA256=<sha256 of that archive> \
-  containers/apt
+  -t apt:2.11.6 containers/apt
 ```
 
 The build runs `apt-genotype-axiom --version` as a test, so the real version

@@ -31,14 +31,19 @@ What it does depends on what `containers.apt` holds:
 
 By default it builds from the [`Dockerfile`](../containers/apt/Dockerfile), which needs `docker` (or `podman`).
 **NCI Gadi has Singularity but no Docker**, and Singularity cannot build from a Dockerfile, so on Gadi you cannot use that default.
-Build the image on a machine that does have Docker, then give `prep.sh` the result:
+Build the image on a machine that does have Docker, then give `prep.sh` the result.
+[`build.sh`](../containers/apt/build.sh) prompts for EULA acceptance, builds (setting `--platform linux/amd64`, which matters on Apple Silicon) and saves the tarball:
 ```
 # on a machine with docker
-docker build -t apt:2.12.0 modules/genotyping/containers/apt
-docker save apt:2.12.0 -o apt-2.12.0.tar
+./modules/genotyping/containers/apt/build.sh          # writes apt-2.12.0.tar
 
 # on Gadi, after copying the archive across
 ./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml --from apt-2.12.0.tar
+```
+Or by hand — the build fails without the EULA acknowledgement:
+```
+docker build --build-arg ACCEPT_THERMOFISHER_EULA=yes -t apt:2.12.0 modules/genotyping/containers/apt
+docker save apt:2.12.0 -o apt-2.12.0.tar
 ```
 Or, if you have pushed the image to a registry you control, pull it directly — this needs no Docker at all:
 ```

@@ -27,6 +27,9 @@
 #                       only for a version prep.sh does not already know: the URL
 #                       is not derivable from the version number.
 #   --apt-sha256 SUM    Expected sha256 of that zip. As for --apt-url.
+#   --accept-eula       Confirm you accept the Thermo Fisher APT EULA (required
+#                       to build from the Dockerfile; you are prompted if a
+#                       terminal is attached and this is not given).
 #   --force             Rebuild even if the target already exists.
 #
 # Paths are interpreted relative to the current directory, which is how
@@ -41,6 +44,7 @@ source_spec="dockerfile"
 apt_version=""
 apt_url=""
 apt_sha256=""
+accept_eula="false"
 force="false"
 
 # The Dockerfile lives next to this script, so the workflow can be installed as
@@ -58,8 +62,9 @@ while [[ $# -gt 0 ]]; do
         --apt-version) apt_version="${2:-}"; shift 2 ;;
         --apt-url)     apt_url="${2:-}"; shift 2 ;;
         --apt-sha256)  apt_sha256="${2:-}"; shift 2 ;;
+        --accept-eula) accept_eula="true"; shift ;;
         --force)       force="true"; shift ;;
-        -h|--help)     sed -n '3,34p' "${BASH_SOURCE[0]}" | cut -c 3-; exit 0 ;;
+        -h|--help)     sed -n '3,37p' "${BASH_SOURCE[0]}" | cut -c 3-; exit 0 ;;
         *)             die "unknown argument: $1" ;;
     esac
 done
@@ -191,6 +196,23 @@ EOF
             build_args+=(--build-arg "APT_URL=$apt_url")
             build_args+=(--build-arg "APT_SHA256=$apt_sha256")
         fi
+
+        # APT is proprietary; building downloads it from Thermo Fisher under
+        # their EULA. Require conscious acceptance (the Dockerfile refuses to
+        # build without it). containers/apt/build.sh is the friendlier route.
+        if [[ "$accept_eula" != "true" ]]; then
+            if [[ -t 0 ]]; then
+                echo "APT is proprietary Thermo Fisher software under an End User License"
+                echo "Agreement; building downloads it from Thermo Fisher. See"
+                echo "containers/apt/README.md."
+                read -r -p "Type 'yes' to accept the Thermo Fisher EULA: " reply
+                [[ "$reply" == "yes" ]] \
+                    || die "EULA not accepted, so nothing was built. Re-run with --accept-eula, or use containers/apt/build.sh."
+            else
+                die "building from the Dockerfile requires accepting the Thermo Fisher EULA: re-run with --accept-eula (see containers/apt/README.md), or use containers/apt/build.sh."
+            fi
+        fi
+        build_args+=(--build-arg "ACCEPT_THERMOFISHER_EULA=yes")
 
         echo "Building $tag with $docker_cmd from $dockerfile_dir"
         "$docker_cmd" build -t "$tag" "${build_args[@]}" "$dockerfile_dir"

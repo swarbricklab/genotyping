@@ -64,6 +64,26 @@ ARG APT_URL=https://downloads.thermofisher.com/APT/APT_${APT_VERSION}/apt_${APT_
 # c5503f95c1c773a319562cac170d24f1e771be7fec39b88f3f72734c9952f9d9.
 ARG APT_SHA256=d715adbc0a14df71e42f14bf250d3c39718d7a6712e8b8b2127192715196bafe
 
+# EULA gate. APT is proprietary Thermo Fisher software (see the header above and
+# containers/apt/README.md); building it downloads APT from Thermo Fisher under
+# their End User License Agreement. This build fails unless you consciously
+# confirm you accept those terms, so no one bundles APT by accident. Checked
+# before the download. containers/apt/build.sh sets this for you after prompting.
+ARG ACCEPT_THERMOFISHER_EULA=no
+RUN if [ "$ACCEPT_THERMOFISHER_EULA" != "yes" ]; then \
+      echo "" >&2; \
+      echo "ERROR: APT is proprietary Thermo Fisher software under an End User" >&2; \
+      echo "License Agreement. Building this image downloads it from Thermo" >&2; \
+      echo "Fisher; see containers/apt/README.md and the header of this file." >&2; \
+      echo "" >&2; \
+      echo "Re-run with  --build-arg ACCEPT_THERMOFISHER_EULA=yes  to confirm" >&2; \
+      echo "you have read and accept the EULA and take responsibility for your" >&2; \
+      echo "own relationship with Thermo Fisher. Or use containers/apt/build.sh," >&2; \
+      echo "which prompts you and sets it." >&2; \
+      echo "" >&2; \
+      exit 1; \
+    fi
+
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl unzip \
  && rm -rf /var/lib/apt/lists/*

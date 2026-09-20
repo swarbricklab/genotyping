@@ -33,7 +33,7 @@ The same script fetches them, into the directory holding `refs.apt.arg_file`:
 ```
 ./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml --what resources
 ```
-Note that APT reads ten files from that directory even though only three are named here — see [fetching the Axiom array files](../docs/run.md#fetching-the-axiom-array-files).
+Note that APT reads eighteen files from that directory even though only some are named here (the arg files reference the rest by bare filename) — see [fetching the Axiom array files](../docs/run.md#fetching-the-axiom-array-files).
 Members of project `a56` get these from the DVC remote instead.
 
 The same script also fetches the `.CEL` files for the test dataset, with `--what testdata`; `--what all` does all three stages.

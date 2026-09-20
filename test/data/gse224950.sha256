@@ -2,19 +2,37 @@
 #
 # Source: GEO series GSE224950 (platform GPL33111, Axiom_UKB_WCSG), deposited by
 # the Powell lab at the Garvan Institute for Neavin et al. 2023 (PMID 37296104).
-# The series has twenty hiPSC lines; these four are the subset used for the test,
-# picked to cover both sexes so the sex calls in the .psam are exercised.
+# This is the full series: all twenty hiPSC lines. Twenty is the Axiom manual's
+# minimum batch size for SNP-specific-prior clustering, so this set exercises the
+# Best Practices QC/genotyping front-end (Dish QC, call-rate QC, plate QC), not
+# just the plumbing.
 #
-#   GSM7036154  iPSC_166       Female
-#   GSM7036155  iPSC_180N      Female
-#   GSM7036159  iPSC_IST3323   Male
-#   GSM7036160  iPSC_MBE0953   Male
+# Per-sample sex is not in the GEO metadata; it is determined by APT's
+# computed_gender at run time and cross-checked. The original four-line subset
+# was 166/180N (female) and IST3323/MBE0953 (male).
 #
 # GEO serves these gzipped and replaces supplementary files in place without
 # changing the accession, so these are checksums of what GEO served on
-# 2026-09-18 rather than anything the depositors or NCBI publish. A mismatch
+# 2026-09-20 rather than anything the depositors or NCBI publish. A mismatch
 # means the deposit has changed, not necessarily that the download is corrupt.
+# (The original four were re-fetched here and matched their 2026-09-18 values.)
 f7502370e54675ae2543618295c09c70c1e8e8863a0e6cd92f34f001e95c3db8  GSM7036154_166.CEL
 27f36246603241de0d23666135b0bb1f9eb4ce60df9b47454b092a40a325b322  GSM7036155_180N.CEL
+ed0ebb4c6eaca63ddd01c19d873c52d743a0ca2977a6a3f904674fadf574ac7b  GSM7036156_FSA0001.CEL
+0e09a50f4c1eb330e4681f6e8d8aefb387c44dbe236a5300e726b9bfbef0c3f6  GSM7036157_FSA0004.CEL
+4dc1ad6516324ef639f898c7a103136347bba3b2a3f1479aa175854687e5902e  GSM7036158_IST1877.CEL
 e117f16c07cb891eafc99d617d733ae4e996ace2f8446021cb45f05e10cd9728  GSM7036159_IST3323.CEL
 9f610b45f30e867ea8b1da1350a395dea8dea45782c5875c7eee70d3f24dee8a  GSM7036160_MBE0953.CEL
+b5416a4801617f013934ce87460664acfca2aa269a958ce62f2980383ac4bf1b  GSM7036161_MBE2817.CEL
+7d2ef26343cd505b1e2325bf860f134b6617bece08752dff83466ccc202d1586  GSM7036162_MBE2900.CEL
+20fe1fa676bf1b57e534f3f681e49eba6c478ae928d378820aadada2210e7946  GSM7036163_TOB0198.CEL
+8086e585e226fe6b6144ccc0847b15cf1e7612fa5dcd763aca2ffb40bfb0517e  GSM7036164_TOB0199.CEL
+957ee7b4e4972d6f142b4e5805174a7f49525145fbe3b9f708373873eeee5fb0  GSM7036165_TOB0205.CEL
+76afc4c3322c4fde0066eb76d67331ddee6273c39b1eab10367cf9ced5ea24c2  GSM7036166_TOB0220.CEL
+6fbf9b631a56e8bafe238d105a3d7fe81e12106fd4fa4c1dd3979b1e80f0f0bf  GSM7036167_TOB0421.CEL
+0de011dffd2c528875123ccf996b303d8ae025d69d7ea768b1a3578482e13b3e  GSM7036168_TOB0435.CEL
+a0dd328d7cad8aa6cf3ea0a6b9f806e89c1c9962cf12990bb7ad4caf7add279e  GSM7036169_WAB0004.CEL
+529d0245cf3e34d708d5460910067986afa1de1c64d0f18af2bf9fb143b7f81b  GSM7036170_WAB0038.CEL
+beb2c9952cb4d5e991fd40164b573fed5d0cffad241a8a44139381c741e53b5c  GSM7036171_WAB0103.CEL
+7dfe34b61b191e2bb69093c0562edcd8aa1369d4b44d4e4920d691935c67f3c4  GSM7036172_FSA0006.CEL
+cc7eff54b403343fc4ed5db7cc03711c42c2690b66d646fc747db9eb2686cfb4  GSM7036173_MBE1006.CEL

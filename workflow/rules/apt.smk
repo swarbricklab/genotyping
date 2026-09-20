@@ -4,10 +4,14 @@ rule apt:
     Runs Affymetrix Power Tools (APT) to perform genotyping on SNP arrays using the provided CEL files and annotation.
     """
     input:
-        cel_list=out_dir/"cel_list.txt",
-        arg_file=config['refs']['apt']['arg_file']
+        # QC-passing samples from the Best-Practices front-end (qc.smk), not the
+        # raw list -- Dish QC + call-rate + plate QC have already removed
+        # failing samples so they cannot contaminate the batch clustering.
+        cel_list=rules.plate_qc.output.cel_list,
+        arg_file=config['refs']['apt']['step2_arg_file']
     output:
         axiom_calls=temp(out_dir/"apt/AxiomGT1.calls.txt"),
+        axiom_summary=temp(out_dir/"apt/AxiomGT1.summary.txt"),
         axiom_snp_posteriors=temp(out_dir/"apt/AxiomGT1.snp-posteriors.txt"),
         apt_report=out_dir/"apt/AxiomGT1.report.txt",
         axiom_dir=temp(directory(out_dir/"apt")),
@@ -15,11 +19,12 @@ rule apt:
     log:
         console=logs/"apt/console.log",
         axiom=logs/"apt/apt-genotype-axiom.log"
-    container: 
+    container:
         apt_container
     shell:
         # NOTE: for now I'm assuming the SNP file format is UKB
         #       - TODO: make more generic to process the PMDA array type
+        # Uses the Step2 SNP-specific-priors arg file (Best Practices step 7).
         """
         annotation_dir=$(dirname {input.arg_file})
         apt-genotype-axiom \
@@ -42,18 +47,29 @@ rule ps_metrics:
     """
     input:
         axiom_snp_posteriors=out_dir/"apt/AxiomGT1.snp-posteriors.txt",
-        axiom_calls=out_dir/"apt/AxiomGT1.calls.txt"
+        axiom_calls=out_dir/"apt/AxiomGT1.calls.txt",
+        axiom_summary=out_dir/"apt/AxiomGT1.summary.txt",
+        apt_report=out_dir/"apt/AxiomGT1.report.txt",
+        special_snps=config['refs']['apt']['special_snps']
     output:
         metrics=temp(out_dir/"ps_metrics/metrics.txt")
     log:
         ps=logs/"ps_metrics/ps_metrics.log",
         console=logs/"ps_metrics/console.log"
-    container: 
+    container:
         apt_container
     shell:
+        # --special-snps / --use-ssp handle chrX/Y/MT/PAR probesets, and
+        # --do-pHW adds the Hardy-Weinberg metric, matching the Best-Practices
+        # (and cna_profiler) SNP QC.
         """
         ps-metrics --posterior-file {input.axiom_snp_posteriors} \
             --call-file {input.axiom_calls} \
+            --summary-file {input.axiom_summary} \
+            --report-file {input.apt_report} \
+            --special-snps {input.special_snps} \
+            --do-pHW true \
+            --use-ssp true \
             --metrics-file {output.metrics} \
             --log-file {log.ps} \
             --console-add-neg-select WARNING,summary,debug \

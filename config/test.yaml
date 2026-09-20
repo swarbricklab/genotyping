@@ -72,4 +72,5 @@ outs:
   vcf_hg38: "test/results/test.hg38.vcf.gz"
   psam: "test/results/test.psam"
   id_map: "test/results/id_map.tsv"
+  report: "test/report"
   logs: "logs/genotyping"

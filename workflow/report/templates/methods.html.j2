@@ -1,0 +1,31 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<h2>Methods &amp; glossary</h2>
+
+<h3>Provenance</h3>
+<table class="kv">
+  <tr><th>APT container</th><td><code>{{ provenance.container_apt }}</code></td></tr>
+  <tr><th>Library package</th><td>{{ provenance.library }}</td></tr>
+  <tr><th>Annotation</th><td>{{ provenance.annotation }}</td></tr>
+  <tr><th>Dish QC threshold</th><td>{{ provenance.dqc_threshold }}</td></tr>
+  <tr><th>Call-rate threshold</th><td>{{ provenance.call_rate_threshold }}%</td></tr>
+  <tr><th>Plate mean call-rate threshold</th><td>{{ provenance.plate_call_rate_threshold }}%</td></tr>
+  <tr><th>Plate pass-rate threshold</th><td>{{ provenance.plate_pass_rate_threshold }}%</td></tr>
+  <tr><th>Generated</th><td>{{ provenance.generated }}</td></tr>
+</table>
+<p class="note">Full tool versions and citations: see the repository's
+   <code>docs/prior-art.md</code> and README "Tools, references and citations".</p>
+
+<h3>Glossary</h3>
+<dl>
+  <dt>Dish QC (DQC)</dt><dd>A 0&ndash;1 score of how well a sample's non-polymorphic
+    probe intensities separate; computed before genotyping. Low DQC indicates a poor-quality array.</dd>
+  <dt>Call rate</dt><dd>Fraction of probesets called (non-missing) for a sample.</dd>
+  <dt>Plate QC</dt><dd>Per-plate mean call rate and the fraction of samples passing, used to flag whole plates.</dd>
+  <dt>Discordance</dt><dd>A genotype-difference score between two samples over jointly-called
+    sites (<code>bcftools gtcheck</code>); higher = more different. An outlier-low value flags a
+    possible duplicate / sample swap.</dd>
+  <dt>Ts/Tv</dt><dd>Transition/transversion ratio &mdash; a genotyping-quality sanity check.</dd>
+  <dt>het/hom</dt><dd>Heterozygous to homozygous call ratio per sample; outliers can indicate contamination.</dd>
+</dl>
+{% endblock %}

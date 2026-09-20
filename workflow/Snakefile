@@ -9,6 +9,8 @@ vcf_hg38=Path(config['outs']['vcf_hg38'])
 psam=Path(config['outs']['psam'])
 id_map=Path(config['outs']['id_map'])
 out_dir=vcf_hg38.parent
+# HTML QC report bundle; defaults to a "report" dir beside the outputs.
+report_dir=Path(config['outs'].get('report', out_dir/"report"))
 
 # Container image providing APT and SNPolisher for the rules in apt.smk.
 #
@@ -32,6 +34,7 @@ include: "rules/qc.smk"
 include: "rules/apt.smk"
 include: "rules/bcftools.smk"
 include: "rules/psam.smk"
+include: "rules/report.smk"
 
 # Rules that are too small to be worth a scheduler round-trip: each handles at
 # most a few thousand rows, or a file of a few hundred KB. Running them in the
@@ -50,6 +53,7 @@ localrules:
     prepare_chromosome_maps,
     prepare_chain,
     make_psam,
+    report,
 
 rule all:
     input:
@@ -57,5 +61,6 @@ rule all:
         vcf_hg38,
         psam,
         id_map,
+        report_dir/"index.html",
 
 

@@ -15,6 +15,7 @@ outs:
   vcf_hg38: "data/snp/genotyping/donors.hg38.vcf.gz"
   psam: "data/snp/genotyping/donors.psam"
   id_map: "data/snp/genotyping/id_map.tsv"
+  report: "data/snp/genotyping/report"
   logs: "logs/snp/genotyping"
 
 # Container images

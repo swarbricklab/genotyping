@@ -1,0 +1,49 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<h2>Variants</h2>
+
+<h3>Overall</h3>
+<table class="kv">
+  <tr><th>records</th><td>{{ sn.get('number of records', '-') }}</td></tr>
+  <tr><th>SNPs</th><td>{{ sn.get('number of SNPs', '-') }}</td></tr>
+  <tr><th>indels</th><td>{{ sn.get('number of indels', '-') }}</td></tr>
+  <tr><th>multiallelic sites</th><td>{{ sn.get('number of multiallelic sites', '-') }}</td></tr>
+  <tr><th>Ts/Tv</th><td>{{ sn.get('ts/tv', '-') }}</td></tr>
+</table>
+
+<h3>Per chromosome</h3>
+<table class="sortable">
+  <thead><tr><th>chrom</th><th>hg19</th><th>hg38</th></tr></thead>
+  <tbody>
+    {% for c in per_chrom %}
+    <tr {% if c.chrom in ['chrY','Y','chrM','chrMT','M','MT'] %}class="highlight"{% endif %}>
+      <td>{{ c.chrom }}</td>
+      <td data-sort="{{ c.hg19 }}">{{ "{:,}".format(c.hg19) }}</td>
+      <td data-sort="{{ c.hg38 }}">{{ "{:,}".format(c.hg38) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3>Per sample</h3>
+{% if psc %}
+<input type="text" data-filter="psc" placeholder="filter..." class="filter">
+<table id="psc" class="sortable">
+  <thead><tr><th>sample</th><th>hom-ref</th><th>hom-alt</th><th>het</th><th>Ts</th><th>Tv</th><th>singletons</th><th>missing</th></tr></thead>
+  <tbody>
+    {% for r in psc %}
+    <tr>
+      <td>{{ r.sample }}</td>
+      <td data-sort="{{ r.nRefHom }}">{{ "{:,}".format(r.nRefHom) }}</td>
+      <td data-sort="{{ r.nNonRefHom }}">{{ "{:,}".format(r.nNonRefHom) }}</td>
+      <td data-sort="{{ r.nHets }}">{{ "{:,}".format(r.nHets) }}</td>
+      <td data-sort="{{ r.nTs }}">{{ "{:,}".format(r.nTs) }}</td>
+      <td data-sort="{{ r.nTv }}">{{ "{:,}".format(r.nTv) }}</td>
+      <td data-sort="{{ r.nSingletons }}">{{ "{:,}".format(r.nSingletons) }}</td>
+      <td data-sort="{{ r.nMissing }}">{{ "{:,}".format(r.nMissing) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}<p class="note">No per-sample stats available.</p>{% endif %}
+{% endblock %}

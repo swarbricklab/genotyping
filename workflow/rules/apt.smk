@@ -131,12 +131,39 @@ rule otv_caller:
             > {log.console} 2>&1
         """
 
+rule finalize_snp_list:
+    """
+    Builds the probeset list to export. otv-caller cannot off-target-analyse
+    hemizygous (chrY / chrMT) probesets, so it drops them from OTV.keep.ps even
+    though ps-classification recommends them -- which is why no Y/MT calls reach
+    the VCF. Add the recommended hemizygous probesets back to the OTV keep list.
+    """
+    input:
+        otv_keep=out_dir/"otv_caller/OTV.keep.ps",
+        recommended=out_dir/"ps_classification/Recommended.ps",
+        special_snps=config['refs']['apt']['special_snps']
+    output:
+        snp_list=temp(out_dir/"otv_caller/export.snp-list.ps")
+    run:
+        sp = pd.read_csv(input.special_snps, sep='\t', comment='#',
+                         header=None, names=['probeset', 'chr'], usecols=[0, 1])
+        hemi = set(sp.loc[sp['chr'].isin(['Y', 'MT']), 'probeset'])
+        recommended = {l.strip() for l in open(input.recommended)
+                       if l.strip() and not l.startswith('#')}
+        keep_lines = [l.rstrip('\n') for l in open(input.otv_keep)]
+        keep_set = {l.strip() for l in keep_lines}
+        add = sorted((hemi & recommended) - keep_set)
+        with open(output.snp_list, 'w') as fh:
+            fh.write('\n'.join(keep_lines).rstrip('\n') + '\n')
+            for pid in add:
+                fh.write(pid + '\n')
+
 rule make_vcf:
     """
     Runs apt-format-result to generate a VCF file from the APT outputs using the SNP annotation file.
     """
     input:
-        otv_keep=out_dir/"otv_caller/OTV.keep.ps",
+        snp_list=out_dir/"otv_caller/export.snp-list.ps",
         otv_dir=out_dir/"otv_caller/",
         data_dir=out_dir/"apt/AxiomAnalysisSuiteData/",
         apt_dir=out_dir/"apt",
@@ -146,14 +173,14 @@ rule make_vcf:
     log:
         apt=logs/"make_vcf/apt_format_result.log",
         console=logs/"make_vcf/console.log"
-    container: 
+    container:
         apt_container
     shell:
         """
         data_dir=$(realpath --relative-to {input.otv_dir} {input.data_dir})
         apt-format-result --batch-folder {input.otv_dir} \
             --batch-folder-data-dir $data_dir \
-            --snp-list-file {input.otv_keep} \
+            --snp-list-file {input.snp_list} \
             --annotation-file {input.annotation} \
             --export-vcf-file {output.vcf_file} \
             --log-file {log.apt} \

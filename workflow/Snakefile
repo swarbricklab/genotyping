@@ -41,6 +41,7 @@ include: "rules/psam.smk"
 # declares one and stays on the cluster.
 localrules:
     map_donors,
+    finalize_snp_list,
     list_cel_files,
     filter_dqc,
     filter_call_rate,
@@ -55,6 +56,6 @@ rule all:
         vcf_hg19,
         vcf_hg38,
         psam,
-        id_map
+        id_map,
 
 

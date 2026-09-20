@@ -54,7 +54,7 @@ rule dqc:
         cel_list=out_dir/"cel_list.txt",
         dqc_arg=config['refs']['apt']['dqc_arg_file']
     output:
-        report=out_dir/"qc/dqc/apt2-genotype.report.txt",
+        report=temp(out_dir/"qc/dqc/apt2-genotype.report.txt"),
         dqc_dir=temp(directory(out_dir/"qc/dqc"))
     log:
         qc=logs/"qc/apt-geno-qc.log",
@@ -81,7 +81,7 @@ rule filter_dqc:
         report=rules.dqc.output.report,
         cel_list=out_dir/"cel_list.txt"
     output:
-        cel_list=out_dir/"qc/cel_list.dqc_pass.txt",
+        cel_list=temp(out_dir/"qc/cel_list.dqc_pass.txt"),
         summary=out_dir/"qc/dqc_summary.csv"
     run:
         bn2path = _basename_to_path(input.cel_list)
@@ -103,7 +103,7 @@ rule call_rate_qc:
         cel_list=rules.filter_dqc.output.cel_list,
         step1_arg=config['refs']['apt']['step1_arg_file']
     output:
-        report=out_dir/"qc/call_rate/AxiomGT1.report.txt",
+        report=temp(out_dir/"qc/call_rate/AxiomGT1.report.txt"),
         cr_dir=temp(directory(out_dir/"qc/call_rate"))
     log:
         axiom=logs/"qc/call_rate.log",
@@ -132,7 +132,7 @@ rule filter_call_rate:
         report=rules.call_rate_qc.output.report,
         cel_list=rules.filter_dqc.output.cel_list
     output:
-        cel_list=out_dir/"qc/cel_list.call_rate_pass.txt",
+        cel_list=temp(out_dir/"qc/cel_list.call_rate_pass.txt"),
         summary=out_dir/"qc/call_rate_summary.csv"
     run:
         bn2path = _basename_to_path(input.cel_list)
@@ -157,7 +157,7 @@ rule plate_qc:
         call_rate_pass=rules.filter_call_rate.output.cel_list,
         donors=config['deps']['donors']
     output:
-        cel_list=out_dir/"qc/cel_list.final.txt",
+        cel_list=temp(out_dir/"qc/cel_list.final.txt"),
         plate_report=out_dir/"qc/plate_qc.csv"
     run:
         plate_of = _plate_of(input.donors)

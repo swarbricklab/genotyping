@@ -1,0 +1,57 @@
+cff-version: 1.2.0
+message: "If you use this workflow, please cite it using the metadata below."
+title: "genotyping: an Axiom SNP microarray CEL-to-VCF Snakemake workflow"
+abstract: >-
+  A Snakemake workflow that converts Applied Biosystems / Thermo Fisher Axiom
+  SNP microarray .CEL files into annotated VCF files (hg19 and lifted over to
+  hg38), by driving Analysis Power Tools (APT) and SNPolisher through the Axiom
+  Best Practices workflow. Intended for genotyping donors so that pooled
+  single-cell RNA-seq data can be demultiplexed.
+type: software
+authors:
+  - given-names: John
+    family-names: Reeves
+    affiliation: "Garvan Institute of Medical Research"
+    alias: johnyaku
+    orcid: "https://orcid.org/0000-0001-7368-7489"
+  - given-names: James
+    family-names: Douglas
+    affiliation: "Garvan Institute of Medical Research"
+    alias: jd-garv
+    orcid: "https://orcid.org/0009-0004-2559-026X"
+  - given-names: Nenad
+    family-names: Bartonicek
+    affiliation: "Peter MacCallum Cancer Centre"
+    alias: nbartonicek
+    orcid: "https://orcid.org/0000-0003-2144-1887"
+  - given-names: Daniel
+    family-names: Roden
+    alias: dlroden
+    orcid: "https://orcid.org/0000-0003-2393-5805"
+  - given-names: Beata
+    family-names: Myler
+    affiliation: "Adelaide University"
+    alias: BeataKiedik
+    orcid: "https://orcid.org/0000-0001-8517-5253"
+  - given-names: Victor
+    family-names: Liu
+    affiliation: "Garvan Institute of Medical Research"
+    alias: vliu378
+    orcid: "https://orcid.org/0009-0008-7628-7825"
+  - given-names: Alexander
+    family-names: Swarbrick
+    affiliation: "Garvan Institute of Medical Research"
+    orcid: "https://orcid.org/0000-0002-3051-5676"
+repository-code: "https://github.com/swarbricklab/genotyping"
+url: "https://github.com/swarbricklab/genotyping"
+license: MIT
+version: "1.0.0"
+date-released: "2026-09-21"
+keywords:
+  - Axiom
+  - "UK Biobank array"
+  - "SNP microarray"
+  - genotyping
+  - Snakemake
+  - VCF
+  - "Analysis Power Tools"

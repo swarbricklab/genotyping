@@ -1,0 +1,36 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<h2>Overview</h2>
+
+<div class="cards">
+  <div class="card"><span class="num">{{ overview.n_samples }}</span><span class="lbl">samples</span></div>
+  <div class="card"><span class="num">{{ "{:,}".format(overview.n_records_hg19) }}</span><span class="lbl">variants (hg19)</span></div>
+  <div class="card"><span class="num">{{ "{:,}".format(overview.n_records_hg38) }}</span><span class="lbl">variants (hg38)</span></div>
+  <div class="card"><span class="num">{{ overview.ts_tv }}</span><span class="lbl">Ts/Tv</span></div>
+</div>
+
+<h3>Sample QC funnel</h3>
+<table class="funnel">
+  {% set base = funnel[0][1] or 1 %}
+  {% for label, n in funnel %}
+  <tr>
+    <th>{{ label }}</th>
+    <td class="barcell"><span class="bar" style="width: {{ (100 * n / base)|round(1) }}%"></span></td>
+    <td class="n">{{ n }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<h3>Sex calls</h3>
+<ul class="inline">
+  {% for sex, n in overview.sex_counts.items() %}<li><strong>{{ n }}</strong> {{ sex }}</li>{% endfor %}
+</ul>
+
+<h3>Liftover</h3>
+<p>{{ overview.n_dropped_liftover }} variants dropped from hg19 to hg38
+   ({{ (100 * overview.n_dropped_liftover / (overview.n_records_hg19 or 1))|round(3) }}%).</p>
+
+<p class="note">See <a href="qc.html">Sample QC</a> for per-sample detail,
+   <a href="relatedness.html">Relatedness</a> for the duplicate / distinguishability check,
+   and <a href="methods.html">Methods</a> for versions and thresholds.</p>
+{% endblock %}

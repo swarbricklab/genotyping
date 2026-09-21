@@ -1,0 +1,57 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<h2>Relatedness &amp; distinguishability</h2>
+
+<p class="note">
+  Pairwise genotype <strong>discordance score</strong> from <code>bcftools gtcheck</code> over
+  jointly-called sites (higher = more different). Darker = more similar (lower discordance).
+  Unrelated donors should be uniformly light; a dark off-diagonal pair is a possible
+  <strong>duplicate or sample swap</strong>. Read the other way, this is a demux-distinguishability
+  matrix &mdash; donors that will be pooled must be mutually distinguishable (light).
+</p>
+
+{% if rel_flags %}
+<div class="warn">
+  <strong>Flagged pairs</strong> (unusually low discordance):
+  <table>
+    <thead><tr><th>sample A</th><th>sample B</th><th>discordance</th><th>sites</th></tr></thead>
+    <tbody>
+      {% for f in rel_flags %}
+      <tr><td>{{ f.a }}</td><td>{{ f.b }}</td><td>{{ f.discordance }}</td><td>{{ "{:,}".format(f.sites) }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="note ok">No unusually similar pairs &mdash; all samples are mutually distinguishable.</p>
+{% endif %}
+
+{% if rel_matrix %}
+<div class="heatmap-wrap">
+<table class="heatmap">
+  <thead>
+    <tr><th></th>{% for s in rel_labels %}<th class="rot"><span>{{ s }}</span></th>{% endfor %}</tr>
+  </thead>
+  <tbody>
+    {% for row in rel_matrix %}
+    <tr>
+      <th>{{ row.sample }}</th>
+      {% for c in row.cells %}
+        {% if c.v is none %}
+          <td class="na"></td>
+        {% else %}
+          {# darker (higher opacity) = lower discordance = more similar #}
+          <td class="cell" style="background: rgba(200,40,40,{{ (1 - c.frac)|round(3) }})"
+              title="{{ "%.4f"|format(c.v) }}"></td>
+        {% endif %}
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="note">Cell tooltip shows the exact discordance. Shading is scaled across the observed range.</p>
+{% else %}
+<p class="note">No pairwise comparison available (need &ge; 2 samples).</p>
+{% endif %}
+{% endblock %}

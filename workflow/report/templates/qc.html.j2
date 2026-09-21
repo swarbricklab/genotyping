@@ -1,0 +1,53 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<h2>Sample QC</h2>
+
+<p class="note">
+  Dish QC threshold {{ provenance.dqc_threshold }}; call-rate threshold {{ provenance.call_rate_threshold }}%.
+  Click a column header to sort; type to filter.
+</p>
+<input type="text" data-filter="qc" placeholder="filter samples..." class="filter">
+<span data-count="qc" class="count"></span>
+
+<table id="qc" class="sortable">
+  <thead>
+    <tr>
+      <th>sample</th><th>plate</th><th>DQC</th><th>DQC pass</th>
+      <th>call rate</th><th>CR pass</th><th>sex</th>
+      <th>het</th><th>missing</th><th>het/hom</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in samples %}
+    <tr>
+      <td>{{ s.sample }}</td>
+      <td>{{ s.plate }}</td>
+      <td data-sort="{{ s.dqc if s.dqc is not none else -1 }}">{{ "%.4f"|format(s.dqc) if s.dqc is not none else "-" }}</td>
+      <td class="{{ 'pass' if s.dqc_pass else 'fail' }}">{{ "pass" if s.dqc_pass else "FAIL" }}</td>
+      <td data-sort="{{ s.call_rate if s.call_rate is not none else -1 }}">{{ "%.3f"|format(s.call_rate) if s.call_rate is not none else "-" }}</td>
+      <td class="{{ 'pass' if s.cr_pass else 'fail' }}">{{ "pass" if s.cr_pass else "FAIL" }}</td>
+      <td>{{ s.sex }}</td>
+      <td data-sort="{{ s.n_het if s.n_het is not none else -1 }}">{{ "{:,}".format(s.n_het) if s.n_het is not none else "-" }}</td>
+      <td data-sort="{{ s.n_missing if s.n_missing is not none else -1 }}">{{ "{:,}".format(s.n_missing) if s.n_missing is not none else "-" }}</td>
+      <td data-sort="{{ s.het_hom if s.het_hom is not none else -1 }}">{{ s.het_hom if s.het_hom is not none else "-" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3>Plate QC</h3>
+{% if plate %}
+<table class="sortable">
+  <thead><tr><th>plate</th><th>total</th><th>passing</th><th>mean call rate</th><th>plate pass rate</th><th>passed</th></tr></thead>
+  <tbody>
+    {% for p in plate %}
+    <tr>
+      <td>{{ p.plate }}</td><td>{{ p.n_total }}</td><td>{{ p.n_pass }}</td>
+      <td>{{ p.mean_call_rate }}</td><td>{{ p.plate_pass_rate }}</td>
+      <td class="{{ 'pass' if p.passed in [true, 'True', 'true'] else 'fail' }}">{{ p.passed }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}<p class="note">No plate QC summary available.</p>{% endif %}
+{% endblock %}

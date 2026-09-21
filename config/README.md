@@ -28,6 +28,14 @@ Once this is set, run [`prep.sh`](../prep.sh) to populate it before the first ru
 ```
 See [preparing the APT container](../docs/run.md#preparing-the-apt-container).
 
+The `refs.apt` entries point at ThermoFisher's library and annotation files for the array, which are also not redistributable.
+The same script fetches them, into the directory holding `refs.apt.arg_file`:
+```
+./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml --what resources
+```
+Note that APT reads ten files from that directory even though only three are named here — see [fetching the Axiom array files](../docs/run.md#fetching-the-axiom-array-files).
+Members of project `a56` get these from the DVC remote instead.
+
 The value in the template is the image used for our published runs, and its registry repository is private, so it will not pull without credentials.
 That fallback is deliberate -- it keeps existing dataset configs resolving to the exact image their results came from -- but it means an authentication error on the first APT rule indicates that `containers.apt` has not been set.
 See [`containers/apt/README.md`](../containers/apt/README.md).
@@ -82,6 +90,8 @@ To include this workflow as a stage in a [DVC](https://dvc.org/) pipeline, copy 
 ```
 
 The `deps` and `outs` must be kept in step with the `deps` and `outs` blocks of the config file.
+Note that the annotation entries above list only the three files the config names, not the ten APT actually reads, so DVC will not notice a change to the other seven.
+Listing `resources/genotyping/annotation` instead would cover all of them, at the cost of changing the stage hash and so forcing a re-run.
 Note that `modules/genotyping/workflow` is listed as a dependency, so that DVC will re-run the stage if the workflow code changes.
 
 See [running the workflow](../docs/run.md#running-as-part-of-a-dvc-super-pipeline) for how to then run and freeze the stage.

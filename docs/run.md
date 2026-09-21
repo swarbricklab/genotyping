@@ -52,6 +52,33 @@ Or, if you have pushed the image to a registry you control, pull it directly —
 Since APT cannot be redistributed, any registry you use has to be your own.
 See [`containers/apt/README.md`](../containers/apt/README.md) for the licensing background and `prep.sh --help` for all options.
 
+## Fetching the Axiom array files
+
+The `refs.apt` entries in the config file point at ThermoFisher's library and annotation files for the array.
+These are vendor-supplied and not redistributable, so they are fetched from ThermoFisher rather than shipped here:
+```
+./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml --what resources
+```
+This downloads release `r5` of the Axiom UK Biobank (`Axiom_UKB_WCSG`) library files and the `na35` annotation database into the directory holding `refs.apt.arg_file`, then verifies them against [`resources/axiom_ukb_wcsg_r5.sha256`](../resources/axiom_ukb_wcsg_r5.sha256).
+About 325 MB of downloads expanding to roughly 2.5 GB, most of it the annotation database.
+Re-running is a no-op once the files are present and match.
+
+Use `--what all` to do this and the container in one go.
+
+**It is ten files, not the three the config names.** The arg file is an XML document that references seven further library files (`.cdf`, `specialSNPs`, `chrXprobes`, `chrYprobes`, `AxiomGT1.sketch`, `AxiomGT1.models`, `snp_specific_parameters.txt`) by bare filename.
+APT resolves those against `--analysis-files-path`, which the `apt` rule sets to the directory containing the arg file — so all ten have to sit in that one directory.
+Downloading only the three named in the config gives a runtime failure, not a config error.
+
+The checksums are ones we recorded, because ThermoFisher publishes none.
+They are verified byte-identical to the files used for the published runs, so a mismatch means the vendor has re-released something and is worth understanding before you rely on the results.
+
+Members of project `a56` do not normally need this step — these files come from the DVC remote instead (`dvc pull`).
+
+### Other arrays
+
+Only `array_type: UKB` is supported.
+The Axiom Precision Medicine Diversity Array (`PMDA`) needs more than a different set of downloads: it has no `ps2snp_map.ps` (the equivalent is `ps2multisnp_map.ps`) and uses a different annotation build, and the workflow does not handle either yet — see the `TODO` in [`workflow/rules/apt.smk`](../workflow/rules/apt.smk).
+
 ## Profiles
 
 This workflow provides two [profiles](https://github.com/swarbricklab/snakemake_config?tab=readme-ov-file#profiles):

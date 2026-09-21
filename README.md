@@ -48,11 +48,11 @@ APT is not open source: the 2.x downloads ship no source code, and the GPL terms
 
 APT is therefore **not covered by the licence for this repository, and cannot be redistributed with it**.
 To run the `apt`, `ps_metrics`, `ps_classification`, `otv_caller` and `make_vcf` rules you must obtain APT from ThermoFisher yourself, under your own acceptance of their terms, and build a container image using the [`Dockerfile`](containers/apt/Dockerfile) in `containers/apt/`.
-Point the workflow at the result with `containers.apt` in your config file, as either a registry reference or the path to a local Singularity image:
+Point the workflow at the result with `containers.apt` in your config file, as either a reference to a registry you control or the path to a local Singularity image:
 
 ```yaml
 containers:
-  apt: "docker://your-registry/apt:2.12.0"
+  apt: "docker://your-private-registry/apt:2.12.0"
 ```
 
 The [`prep.sh`](prep.sh) script does this for you — it builds the image, converts it for Singularity if needed, puts it where `containers.apt` points, and checks that APT runs inside it:
@@ -61,16 +61,8 @@ The [`prep.sh`](prep.sh) script does this for you — it builds the image, conve
 ./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml
 ```
 
-Because APT cannot be redistributed, any registry you use has to be one you control.
+Because APT cannot be redistributed, any registry you use must be one you control (a private or institutional registry) -- do not push the image to a public registry such as Docker Hub, GHCR, or Quay.
 See [preparing the APT container](docs/run.md#preparing-the-apt-container) for the options, including clusters such as NCI Gadi that provide Singularity but not Docker, and [`containers/apt/README.md`](containers/apt/README.md) for the licensing background.
-
-> Earlier revisions of this workflow pinned `docker://swarbricklab/ctp-tools:apt-2.10.2`, a public image that bundled the APT binaries.
-> That image is no longer public, because publishing it was not compatible with the EULA above.
-> Anything pinning a `paper/`-tagged revision of this workflow will still reference it and will need to be repointed at a locally built image.
-
-Note that the version recorded in that image tag was not accurate: `apt-genotype-axiom` in it reports **2.10.0**, while the SNPolisher tools report 2.10.2.
-Genotypes are called by `apt-genotype-axiom`, so **2.10.0** is the version to quote for the calling step.
-ThermoFisher still publishes 2.10.0, at a different URL from the current release; `prep.sh --apt-version 2.10.0` builds an image that reproduces the calling step, while the default builds the current 2.12.0. See [`containers/apt/README.md`](containers/apt/README.md#versions).
 
 The array library and annotation files referenced under `refs.apt` in the config file (`Axiom_UKB_WCSG.*`) are vendor-supplied and likewise cannot be redistributed here.
 ThermoFisher reserves all rights in them, and they are not covered by the APT EULA, which applies only to the software.
@@ -126,12 +118,6 @@ Genotypes are called by `apt-genotype-axiom`, so **2.10.0** is the version to qu
 ### Citing this workflow
 
 A [`CITATION.cff`](CITATION.cff) at the repository root provides citation metadata, which GitHub surfaces via *Cite this repository*.
-
-To mint a DOI for the archived workflow (once the repository is public):
-
-1. Enable the repository at [zenodo.org](https://zenodo.org) → *GitHub* (Zenodo only sees public repositories).
-2. Create a GitHub release (e.g. `v1.0.0`); Zenodo archives it and mints a version DOI plus a version-independent *concept* DOI.
-3. Add the concept DOI to `CITATION.cff` in an `identifiers:` block.
 
 Known caveats of the workflow's output are documented in [docs/limitations.md](docs/limitations.md).
 

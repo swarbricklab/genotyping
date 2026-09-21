@@ -148,7 +148,7 @@ Set `containers.apt` in your config file to the image you built:
 
 ```yaml
 containers:
-  apt: "docker://your-registry/apt:2.12.0"
+  apt: "docker://your-private-registry/apt:2.12.0"
 ```
 
 That one value is used by all five APT rules (`apt`, `ps_metrics`,

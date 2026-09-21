@@ -27,7 +27,7 @@ containers:
   # this at it -- either a registry reference, or the path to a local
   # Singularity image:
   #
-  #   apt: "docker://your-registry/apt:2.12.0"
+  #   apt: "docker://your-private-registry/apt:2.12.0"
   #   apt: "containers/apt-2.12.0.sif"
   #
   # Set this first, then run prep.sh to populate it:

@@ -20,7 +20,8 @@ Refer to the comments in the template for the meaning for each item.
 
 One item usually does need changing: **`containers.apt`**.
 This names the container image providing Analysis Power Tools (APT) and SNPolisher, which are proprietary and cannot be redistributed with this workflow.
-Build your own image with the [`Dockerfile`](../containers/apt/Dockerfile) in `containers/apt/` and set `containers.apt` to either a registry reference or the path of a local Singularity image.
+Build your own image with the [`Dockerfile`](../containers/apt/Dockerfile) in `containers/apt/` and set `containers.apt` to either a reference to a registry you control or the path of a local Singularity image.
+Because APT cannot be redistributed, do not push the image to a public registry (Docker Hub, GHCR, Quay) -- use a private or institutional registry, or a local image.
 
 Once this is set, run [`prep.sh`](../prep.sh) to populate it before the first run — it reads this same key, so the two cannot drift apart:
 ```

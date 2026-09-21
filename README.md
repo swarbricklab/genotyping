@@ -37,6 +37,7 @@ Further reading: [Axiom Genotyping Solution Data Analysis User Guide](https://as
 - [Installation](docs/installation.md) -- installing this workflow as a git submodule
 - [Configuration](config/README.md) -- the config file and the sample sheet
 - [Running the workflow](docs/run.md) -- environment, profiles and the run scripts
+- [Prior art and citations](docs/prior-art.md) -- how to cite the tools this workflow drives, and how it relates to existing Axiom genotyping pipelines
 
 ## Third-party software
 

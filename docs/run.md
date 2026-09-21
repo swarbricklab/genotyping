@@ -94,8 +94,6 @@ APT cannot read gzipped CEL files, so `prep.sh` expands them; GEO serves them gz
 The four lines are two female and two male, so the sex calls in the `.psam` are exercised rather than being uniform.
 The series has twenty lines in total, and the subset is set by the manifest — adding a line means adding its checksum there and a row to `config/donors.csv`.
 
-Note that [`config/test.yaml`](../config/test.yaml) puts the array files in `resources/axiom/` rather than the `resources/genotyping/` used by the lab's own datasets, because the latter is a DVC import from a private repository.
-
 ## Genome references
 
 The workflow needs three genome references, all from public sources:

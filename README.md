@@ -136,7 +136,7 @@ See [fetching the test data](docs/run.md#fetching-the-test-data).
 Earlier releases tested against SNP microarray measurements from our own donors, which are potentially identifiable and not publicly redistributable.
 Those files are no longer referenced here; researchers wanting them should refer to the data availability statement of the associated publication.
 
-The bundled test dataset (`config/test.yaml`) is reproducible outside the lab: `prep.sh --what all --configfile config/test.yaml` fetches the APT container, the public Axiom array files, and the public test CEL files ([GEO GSE224950](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224950)), and the reference genomes are public [DVC](https://dvc.org/) `import-url` stages pulled with `dvc update`. The only still-private import is `resources/genotyping.dvc`, used by the lab's own template config rather than by the test.
+The bundled test dataset (`config/test.yaml`) is reproducible outside the lab: `prep.sh --what all --configfile config/test.yaml` fetches the APT container, the public Axiom array files, and the public test CEL files ([GEO GSE224950](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224950)), and the reference genomes are public [DVC](https://dvc.org/) `import-url` stages pulled with `dvc update`. Every input is publicly obtainable -- the repository has no private data imports.
 
 The workflow itself does not depend on any private data -- it can be run on any set of Axiom `.CEL` files by pointing the config file at them.
 

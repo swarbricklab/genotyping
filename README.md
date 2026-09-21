@@ -131,7 +131,7 @@ To mint a DOI for the archived workflow (once the repository is public):
 
 1. Enable the repository at [zenodo.org](https://zenodo.org) → *GitHub* (Zenodo only sees public repositories).
 2. Create a GitHub release (e.g. `v1.0.0`); Zenodo archives it and mints a version DOI plus a version-independent *concept* DOI.
-3. Add the concept DOI to `CITATION.cff` (uncomment the `identifiers` block).
+3. Add the concept DOI to `CITATION.cff` in an `identifiers:` block.
 
 Known caveats of the workflow's output are documented in [docs/limitations.md](docs/limitations.md).
 

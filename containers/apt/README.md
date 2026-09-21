@@ -186,10 +186,7 @@ Note that Snakemake does **not** check that a local path exists when it builds
 the DAG, so a wrong path survives `--dry-run` and only fails when the first APT
 rule runs. Running `prep.sh` first avoids that class of surprise.
 
-If you omit `containers.apt`, the workflow falls back to the image used for our
-published runs. That repository is **private**, so the fallback will fail to
-pull for anyone outside the lab — by design, since we cannot redistribute APT.
-The fallback exists so that existing dataset configs keep resolving to the
-exact image their results came from. If you see an authentication or
-"failed to get checksum" error from `singularity pull` on the first APT rule,
-you have not set `containers.apt`.
+`containers.apt` has no default: if it is unset or empty, the workflow stops
+immediately with an error telling you to set it. There is no public APT image
+to fall back to — APT cannot be redistributed — so build one (above) and point
+`containers.apt` at it.

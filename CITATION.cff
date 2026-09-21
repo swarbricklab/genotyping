@@ -45,14 +45,8 @@ authors:
 repository-code: "https://github.com/swarbricklab/genotyping"
 url: "https://github.com/swarbricklab/genotyping"
 license: MIT
-version: "1.0.0"            # TODO: set to the released tag
-date-released: "2026-09-20" # TODO: set to the release date
-# After archiving a release on Zenodo (see docs/run.md), add the DOI here so
-# that GitHub's "Cite this repository" widget and downstream tools pick it up:
-# identifiers:
-#   - type: doi
-#     value: "10.5281/zenodo.XXXXXXX"
-#     description: "Concept DOI (all versions)"
+version: "1.0.0"
+date-released: "2026-09-21"
 keywords:
   - Axiom
   - "UK Biobank array"

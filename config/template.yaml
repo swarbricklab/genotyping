@@ -57,7 +57,12 @@ refs:
     # are omitted, which changes the VCF header but not the variant calls.
     hg38_chromosomes: "resources/genomes/GRCh38"
     chain: "resources/liftover/hg19ToHg38.over.chain.gz"
+  # Axiom array library and annotation files, fetched from Thermo Fisher by
+  #
+  #   ./prep.sh --what resources --configfile config/genotyping/config.yaml
+  #
+  # which reads arg_file below to decide where they go.
   apt:
-    arg_file: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml"
-    ps2snp: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps"
-    annotation: "resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db"
+    arg_file: "resources/axiom/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml"
+    ps2snp: "resources/axiom/Axiom_UKB_WCSG.r5.ps2snp_map.ps"
+    annotation: "resources/axiom/Axiom_UKB_WCSG.na35.annot.db"

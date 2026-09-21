@@ -41,10 +41,7 @@ refs:
   #
   #   ./prep.sh --what resources --configfile config/test.yaml
   #
-  # which reads arg_file below to decide where they go. This deliberately does
-  # not reuse resources/genotyping: that is a DVC import from a private lab
-  # repository, so pointing the test at it would make the test unrunnable for
-  # anyone outside the lab.
+  # which reads arg_file below to decide where they go.
   apt:
     arg_file: "resources/axiom/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml"
     ps2snp: "resources/axiom/Axiom_UKB_WCSG.r5.ps2snp_map.ps"

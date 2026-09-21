@@ -83,9 +83,9 @@ To include this workflow as a stage in a [DVC](https://dvc.org/) pipeline, copy 
       - resources/genomes/hg19/hg19.fa.gz
       - resources/genomes/GRCh38
       - resources/liftover/hg19ToHg38.over.chain.gz
-      - resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml
-      - resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps
-      - resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db
+      - resources/axiom/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml
+      - resources/axiom/Axiom_UKB_WCSG.r5.ps2snp_map.ps
+      - resources/axiom/Axiom_UKB_WCSG.na35.annot.db
     outs:
       - data/snp/genotyping
       - logs/snp/genotyping
@@ -93,7 +93,7 @@ To include this workflow as a stage in a [DVC](https://dvc.org/) pipeline, copy 
 
 The `deps` and `outs` must be kept in step with the `deps` and `outs` blocks of the config file.
 Note that the annotation entries above list only the three files the config names, not the ten APT actually reads, so DVC will not notice a change to the other seven.
-Listing `resources/genotyping/annotation` instead would cover all of them, at the cost of changing the stage hash and so forcing a re-run.
+Listing `resources/axiom` instead would cover all of them, at the cost of changing the stage hash and so forcing a re-run.
 Note that `modules/genotyping/workflow` is listed as a dependency, so that DVC will re-run the stage if the workflow code changes.
 
 See [running the workflow](../docs/run.md#running-as-part-of-a-dvc-super-pipeline) for how to then run and freeze the stage.

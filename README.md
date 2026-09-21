@@ -38,6 +38,7 @@ Further reading: [Axiom Genotyping Solution Data Analysis User Guide](https://as
 - [Configuration](config/README.md) -- the config file and the sample sheet
 - [Running the workflow](docs/run.md) -- environment, profiles and the run scripts
 - [Prior art and citations](docs/prior-art.md) -- how to cite the tools this workflow drives, and how it relates to existing Axiom genotyping pipelines
+- [Known limitations](docs/limitations.md) -- chrY/chrMT calls, supported array types, and other caveats
 
 ## Third-party software
 

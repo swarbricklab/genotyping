@@ -23,3 +23,11 @@ dt_clone {repository_url}
 ```
 The `dt_clone` command is available within DVC environments on NCI.
 This command checks out submodules and sets the DVC cache to a shared location.
+
+## Standalone use (trying the test dataset)
+
+To evaluate the workflow on its own -- for example to run the bundled public test dataset -- clone it directly, including its submodules (it pulls in the shared `profiles/global` profile):
+```
+git clone --recurse-submodules git@github.com:swarbricklab/genotyping.git
+```
+Then fetch the inputs and run the test as described in [Running the workflow](run.md) -- see the test-run instructions there and `prep.sh --what all --configfile config/test.yaml`.

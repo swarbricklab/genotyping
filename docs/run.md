@@ -95,7 +95,21 @@ The four lines are two female and two male, so the sex calls in the `.psam` are 
 The series has twenty lines in total, and the subset is set by the manifest — adding a line means adding its checksum there and a row to `config/donors.csv`.
 
 Note that [`config/test.yaml`](../config/test.yaml) puts the array files in `resources/axiom/` rather than the `resources/genotyping/` used by the lab's own datasets, because the latter is a DVC import from a private repository.
-The genome references in `refs.genomes` are still pulled from the DVC remote, which is internal to project `a56`.
+
+## Genome references
+
+The workflow needs three genome references, all from public sources:
+
+| Reference | Source | How it is obtained |
+|-----------|--------|--------------------|
+| `hg19` FASTA | UCSC `goldenPath/hg19` | `dvc import-url` (`resources/genomes/hg19/hg19.fa.gz`) |
+| `hg19`→`hg38` chain | UCSC `gbdb/hg19/liftOver` | `dvc import-url` (`resources/liftover/`) |
+| `hg38` (GRCh38) FASTA | Ensembl release-98 | 25 `dvc import-url` stages + the `prepare_hg38` rule |
+
+The `hg38` reference is **built by the workflow**, not downloaded whole.
+`resources/genomes/GRCh38/` holds 25 `dvc import-url` stages, one per Ensembl release-98 per-chromosome FASTA (`Homo_sapiens.GRCh38.dna.chromosome.{1..22,X,Y,MT}.fa.gz`), and the [`prepare_hg38`](../workflow/rules/prep.smk) rule rewrites each header to the chr-prefixed name the chain uses (`MT`→`chrM`), concatenates them in the same order as the 10x `GRCh38-2020-A` reference used for the published runs, and indexes the result.
+
+This replaces an 18 GB `dvc import` of `refdata-gex-GRCh38-2020-A` from a private lab repository. Its sequence is **byte-identical** to that reference's main chromosomes — only the 169 empty scaffold contigs are dropped, which changes the VCF's `##contig` header but not a single variant call. Members of project `a56` still get all three references via `dvc pull`; anyone else gets them with `dvc update` (which re-fetches from the public URLs above).
 
 ## Profiles
 

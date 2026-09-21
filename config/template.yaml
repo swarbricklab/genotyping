@@ -48,7 +48,14 @@ containers:
 refs:
   genomes:
     hg19: "resources/genomes/hg19/hg19.fa.gz"
-    hg38: "resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa"
+    # The hg38 (GRCh38) reference is built by the workflow (rule prepare_hg38)
+    # from Ensembl release-98 per-chromosome FASTAs, fetched into the directory
+    # below by dvc import-url (main chromosomes only). Its sequence is
+    # byte-identical to the 10x GRCh38-2020-A reference previously used
+    # ("resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa", an 18 GB
+    # import from a private lab repository); only the empty scaffold contigs
+    # are omitted, which changes the VCF header but not the variant calls.
+    hg38_chromosomes: "resources/genomes/GRCh38"
     chain: "resources/liftover/hg19ToHg38.over.chain.gz"
   apt:
     arg_file: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml"

@@ -96,14 +96,14 @@ This section records the provenance a citing manuscript needs. Full citations, w
 
 | Tool | Version | Container | Role |
 |---|---|---|---|
-| Analysis Power Tools (APT) | `apt-genotype-axiom` **2.10.0** (calling); `ps-metrics`/`ps-classification` 2.10.2; `apt-format-result` 2.10.2.2 | `swarbricklab/ctp-tools:apt-2.10.2` (private; a version mix — see [containers/apt/README.md](containers/apt/README.md#versions)) | genotype calling, metrics, classification, OTV, VCF export |
+| Analysis Power Tools (APT) | `apt-genotype-axiom` **2.10.0** (calling step; the manuscript version) | built from [`containers/apt/`](containers/apt/README.md) | genotype calling, metrics, classification, OTV, VCF export |
 | SNPolisher | bundled in the APT image | as above | probeset classification |
 | bcftools | 1.21 | `quay.io/biocontainers/bcftools:1.21--h8b25389_0` | VCF formatting |
 | bcftools `+liftover` | bcftools 1.18 + [liftover plugin](https://github.com/freeseek/score) | `yangyxt/bcftools_liftover:1.18` | hg19 → hg38 liftover |
 | samtools | 1.21 | `quay.io/biocontainers/samtools:1.21--h50ea8bc_0` | FASTA indexing |
 | Snakemake | 7.32.4 | conda ([`env/snakemake_7.32.4.yaml`](env/snakemake_7.32.4.yaml)) | workflow engine |
 
-Genotypes are called by `apt-genotype-axiom`, so **2.10.0** is the version to quote for the calling step. See [containers/apt/README.md](containers/apt/README.md#versions) for how to build a container pinned to that version.
+See [containers/apt/README.md](containers/apt/README.md#versions) for how to build the container, including pinning the manuscript's APT 2.10.0.
 
 ### Reference data
 

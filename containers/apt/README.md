@@ -68,19 +68,10 @@ The 2.10.0 archive nests its `bin/`, EULA and `licenses/` under a top-level
 directory, where 2.12.0 has them at the archive root; the Dockerfile detects
 either layout, so no other change is needed to switch versions.
 
-Some history worth knowing, since it affects how you read the methods:
-
-- The image this workflow used to pin, `swarbricklab/ctp-tools:apt-2.10.2`,
-  was **mislabelled**. `apt-genotype-axiom` in it reports `2.10.0`, while
-  `ps-metrics` and `ps-classification` report `2.10.2` and
-  `apt-format-result` reports `2.10.2.2`. It was assembled by copying
-  binaries from more than one APT release, and carried no record of which
-  archives they came from.
-- Mixed versions within a bundle are not unusual — Thermo Fisher's own
-  official 2.12.0 archive ships `otv-caller` 2.11.6.
-
-So when quoting a version, say which binary you mean. Genotypes are called by
-`apt-genotype-axiom`.
+When quoting an APT version, say which binary you mean: a single bundle can
+mix versions (Thermo Fisher's own official 2.12.0 archive ships `otv-caller`
+2.11.6). Genotypes are called by `apt-genotype-axiom`, so that is the version
+to quote for the calling step.
 
 ## Building
 
@@ -148,7 +139,7 @@ Set `containers.apt` in your config file to the image you built:
 
 ```yaml
 containers:
-  apt: "docker://your-registry/apt:2.12.0"
+  apt: "docker://your-private-registry/apt:2.12.0"
 ```
 
 That one value is used by all five APT rules (`apt`, `ps_metrics`,
@@ -195,10 +186,7 @@ Note that Snakemake does **not** check that a local path exists when it builds
 the DAG, so a wrong path survives `--dry-run` and only fails when the first APT
 rule runs. Running `prep.sh` first avoids that class of surprise.
 
-If you omit `containers.apt`, the workflow falls back to the image used for our
-published runs. That repository is **private**, so the fallback will fail to
-pull for anyone outside the lab — by design, since we cannot redistribute APT.
-The fallback exists so that existing dataset configs keep resolving to the
-exact image their results came from. If you see an authentication or
-"failed to get checksum" error from `singularity pull` on the first APT rule,
-you have not set `containers.apt`.
+`containers.apt` has no default: if it is unset or empty, the workflow stops
+immediately with an error telling you to set it. There is no public APT image
+to fall back to — APT cannot be redistributed — so build one (above) and point
+`containers.apt` at it.

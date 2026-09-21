@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import numpy as np
+from snakemake.exceptions import WorkflowError
 
 # Global paths
 logs=Path(config['outs']['logs'])
@@ -14,18 +15,17 @@ out_dir=vcf_hg38.parent
 #
 # APT is proprietary and cannot be redistributed with this workflow, so the
 # image has to be supplied by whoever runs it. Build one with the Dockerfile
-# in containers/apt/ and set containers.apt in the config file, either to a
-# registry reference or to the path of a local .sif file.
-#
-# The default below names the image used for our published runs. It is a
-# private registry repository, so it will not pull for anyone outside the lab
-# -- that is deliberate rather than an oversight. It is kept as the default so
-# that the config files of existing datasets keep resolving to the exact image
-# their results were produced with, and so that the provenance is recorded in
-# the code rather than only in prose.
-apt_container=config.get('containers', {}).get(
-    'apt', "docker://swarbricklab/ctp-tools:apt-2.10.2"
-)
+# in containers/apt/ (see containers/apt/README.md) and set containers.apt in
+# the config file, either to a reference to a registry you control or to the
+# path of a local .sif file. There is no default -- it must be set.
+apt_container=(config.get('containers') or {}).get('apt')
+if not apt_container:
+    raise WorkflowError(
+        "containers.apt is not set. APT is proprietary and cannot be shipped "
+        "with this workflow, so you must build the image yourself (see "
+        "containers/apt/README.md) and set containers.apt to a registry you "
+        "control or a local Singularity image."
+    )
 
 include: "rules/prep.smk"
 include: "rules/apt.smk"

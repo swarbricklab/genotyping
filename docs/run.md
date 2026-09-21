@@ -47,7 +47,7 @@ docker save apt:2.12.0 -o apt-2.12.0.tar
 ```
 Or, if you have pushed the image to a registry you control, pull it directly — this needs no Docker at all:
 ```
-./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml --from docker://your-registry/apt:2.12.0
+./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml --from docker://your-private-registry/apt:2.12.0
 ```
 Since APT cannot be redistributed, any registry you use has to be your own.
 See [`containers/apt/README.md`](../containers/apt/README.md) for the licensing background and `prep.sh --help` for all options.

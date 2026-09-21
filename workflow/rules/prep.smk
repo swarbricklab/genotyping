@@ -99,10 +99,10 @@ rule prepare_int_fai:
         """
         cat {input.fai} \
             | sed '/_/d' \
-            | sed '/M/d' \
-            | sed 's/^chr//g' \
-            | sed 's/Y/23/g' \
-            | sed 's/X/24/g' \
+            | sed 's/^chr//' \
+            | sed 's/^M/26/' \
+            | sed 's/^Y/25/' \
+            | sed 's/^X/24/' \
             | sort -n \
             > {output.int_fai}
         """
@@ -117,12 +117,14 @@ rule prepare_chromosome_maps:
         """
         cat {input.int_fai} \
             | awk -F'\t' '{{print $1 "\t" $1}}' \
-            | sed 's/\t23/\tY/g' \
-            | sed 's/\t24/\tX/g' \
+            | sed 's/\t24$/\tX/' \
+            | sed 's/\t25$/\tY/' \
+            | sed 's/\t26$/\tMT/' \
             > {output.intxy_map}
         cat {output.intxy_map} \
             | awk -F'\t' 'BEGIN {{OFS="\t"}} {{print $2, $2}}' \
-            | sed 's/\t/\tchr/g' \
+            | sed 's/\t/\tchr/' \
+            | sed 's/\tchrMT$/\tchrM/' \
             > {output.chr_map}
         """
 

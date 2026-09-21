@@ -58,6 +58,20 @@ refs:
     hg38_chromosomes: "resources/genomes/GRCh38"
     chain: "resources/liftover/hg19ToHg38.over.chain.gz"
   apt:
+    # arg_file anchors the directory the other library files are resolved
+    # against; genotyping itself uses the Step1/Step2 arg files below.
     arg_file: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml"
     ps2snp: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps"
     annotation: "resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db"
+    special_snps: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.specialSNPs"
+    dqc_arg_file: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-geno-qc.AxiomQC1.xml"
+    step1_arg_file: "resources/genotyping/annotation/Axiom_UKB_WCSG_SNPSpecificPriors_Step1.r5.apt-genotype-axiom.AxiomGT1.apt2.xml"
+    step2_arg_file: "resources/genotyping/annotation/Axiom_UKB_WCSG_SNPSpecificPriors_Step2.r5.apt-genotype-axiom.AxiomGT1.apt2.xml"
+
+# Quality control (Axiom Best Practices thresholds)
+qc:
+  dqc_threshold: 0.82
+  call_rate_threshold: 97.0
+  plate_call_rate_threshold: 98.5
+  plate_pass_rate_threshold: 95.0
+  exclude_failing_plates: false

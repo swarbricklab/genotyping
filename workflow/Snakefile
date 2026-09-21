@@ -28,6 +28,7 @@ apt_container=config.get('containers', {}).get(
 )
 
 include: "rules/prep.smk"
+include: "rules/qc.smk"
 include: "rules/apt.smk"
 include: "rules/bcftools.smk"
 include: "rules/psam.smk"
@@ -40,7 +41,11 @@ include: "rules/psam.smk"
 # declares one and stays on the cluster.
 localrules:
     map_donors,
+    finalize_snp_list,
     list_cel_files,
+    filter_dqc,
+    filter_call_rate,
+    plate_qc,
     prepare_int_fai,
     prepare_chromosome_maps,
     prepare_chain,
@@ -51,6 +56,6 @@ rule all:
         vcf_hg19,
         vcf_hg38,
         psam,
-        id_map
+        id_map,
 
 

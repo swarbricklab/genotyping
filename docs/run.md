@@ -65,9 +65,9 @@ Re-running is a no-op once the files are present and match.
 
 Use `--what all` to do this, the container, and the test data below in one go.
 
-**It is ten files, not the three the config names.** The arg file is an XML document that references seven further library files (`.cdf`, `specialSNPs`, `chrXprobes`, `chrYprobes`, `AxiomGT1.sketch`, `AxiomGT1.models`, `snp_specific_parameters.txt`) by bare filename.
-APT resolves those against `--analysis-files-path`, which the `apt` rule sets to the directory containing the arg file — so all ten have to sit in that one directory.
-Downloading only the three named in the config gives a runtime failure, not a config error.
+**It is eighteen files, more than the config names.** The config names the arg files (genotyping, Dish QC, and the Step1/Step2 SNP-specific-priors passes), `ps2snp`, the annotation database and `specialSNPs`; each arg file is an XML document that references further library files (`.cdf`, `chrXprobes`, `chrYprobes`, `AxiomGT1.sketch`, `AxiomGT1.models`, `snp_specific_parameters.txt`, `reagent_kit_discriminators.ps`, `qca`, `qcc`, `step1.ps`, `step2.ps`) by bare filename.
+APT resolves those against `--analysis-files-path`, which the rules set to the directory containing the arg files — so all of them have to sit in that one directory (the full list is in the checksum manifest).
+Downloading only the files named in the config gives a runtime failure, not a config error.
 
 The checksums are ones we recorded, because ThermoFisher publishes none.
 They are verified byte-identical to the files used for the published runs, so a mismatch means the vendor has re-released something and is worth understanding before you rely on the results.
@@ -110,6 +110,18 @@ The `hg38` reference is **built by the workflow**, not downloaded whole.
 `resources/genomes/GRCh38/` holds 25 `dvc import-url` stages, one per Ensembl release-98 per-chromosome FASTA (`Homo_sapiens.GRCh38.dna.chromosome.{1..22,X,Y,MT}.fa.gz`), and the [`prepare_hg38`](../workflow/rules/prep.smk) rule rewrites each header to the chr-prefixed name the chain uses (`MT`→`chrM`), concatenates them in the same order as the 10x `GRCh38-2020-A` reference used for the published runs, and indexes the result.
 
 This replaces an 18 GB `dvc import` of `refdata-gex-GRCh38-2020-A` from a private lab repository. Its sequence is **byte-identical** to that reference's main chromosomes — only the 169 empty scaffold contigs are dropped, which changes the VCF's `##contig` header but not a single variant call. Members of project `a56` still get all three references via `dvc pull`; anyone else gets them with `dvc update` (which re-fetches from the public URLs above).
+
+## Sample QC (Axiom Best Practices)
+
+Before genotyping, the workflow runs the Axiom Best Practices sample-QC front end (see [`workflow/rules/qc.smk`](../workflow/rules/qc.smk)):
+
+1. **Dish QC** (`apt-geno-qc-axiom`) — drops samples below `qc.dqc_threshold` (default 0.82);
+2. **QC call rate** — a first genotyping pass with the Step1 SNP-specific-priors arg file, dropping samples below `qc.call_rate_threshold` (default 97%);
+3. **Plate QC** — per-plate mean call rate and pass rate (`qc.plate_call_rate_threshold` 98.5%, `qc.plate_pass_rate_threshold` 95%), grouped by an optional `plate` column in the sample sheet. Advisory by default; set `qc.exclude_failing_plates: true` to drop failing plates' samples.
+
+Genotyping then runs on the surviving samples with the Step2 SNP-specific-priors arg file. Per-sample QC results are written to `<results>/qc/` (`dqc_summary.csv`, `call_rate_summary.csv`, `plate_qc.csv`).
+
+**This front end needs APT 2.12.0** — it provides `apt-geno-qc-axiom`, which the older 2.10.x image lacks. Point `containers.apt` at a 2.12.0 image (see [preparing the APT container](#preparing-the-apt-container)). The thresholds live in the `qc:` block of the config file.
 
 ## Profiles
 

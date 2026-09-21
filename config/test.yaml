@@ -15,11 +15,14 @@ deps:
 
 # Container images
 containers:
-  # Image providing APT and SNPolisher. See config/template.yaml for the full
-  # explanation, and run ./prep.sh --configfile config/test.yaml to populate
-  # it. The value below is the private image used for our published runs, so
-  # replace it with your own before running the test.
-  apt: "docker://swarbricklab/ctp-tools:apt-2.10.2"
+  # Image providing APT and SNPolisher. The Best-Practices front-end needs APT
+  # 2.12.0 (it provides apt-geno-qc-axiom for Dish QC, which the older 2.10.x
+  # image lacks). Build it from containers/apt/ (see containers/apt/README.md),
+  # then place it here with:
+  #
+  #   ./prep.sh --from apt-2.12.0.tar --configfile config/test.yaml
+  #
+  apt: "containers/apt-2.12.0.sif"
 
 # References
 refs:
@@ -43,9 +46,25 @@ refs:
   # repository, so pointing the test at it would make the test unrunnable for
   # anyone outside the lab.
   apt:
+    # arg_file anchors the directory the other library files are resolved
+    # against; prep.sh reads it to decide where to download them. Genotyping
+    # itself uses the Step1/Step2 SNP-specific-priors arg files below.
     arg_file: "resources/axiom/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml"
     ps2snp: "resources/axiom/Axiom_UKB_WCSG.r5.ps2snp_map.ps"
     annotation: "resources/axiom/Axiom_UKB_WCSG.na35.annot.db"
+    special_snps: "resources/axiom/Axiom_UKB_WCSG.r5.specialSNPs"
+    # Best-Practices QC/genotyping arg files (fetched by prep.sh --what resources):
+    dqc_arg_file: "resources/axiom/Axiom_UKB_WCSG.r5.apt-geno-qc.AxiomQC1.xml"
+    step1_arg_file: "resources/axiom/Axiom_UKB_WCSG_SNPSpecificPriors_Step1.r5.apt-genotype-axiom.AxiomGT1.apt2.xml"
+    step2_arg_file: "resources/axiom/Axiom_UKB_WCSG_SNPSpecificPriors_Step2.r5.apt-genotype-axiom.AxiomGT1.apt2.xml"
+
+# Quality control (Axiom Best Practices thresholds)
+qc:
+  dqc_threshold: 0.82            # drop samples with Dish QC below this
+  call_rate_threshold: 97.0      # drop samples with QC call rate (%) below this
+  plate_call_rate_threshold: 98.5  # a plate's mean call rate must be >= this
+  plate_pass_rate_threshold: 95.0  # % of a plate's samples that must pass
+  exclude_failing_plates: false  # advisory by default: flag but keep failing plates
 
 # Outputs
 outs:

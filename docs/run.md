@@ -63,7 +63,7 @@ This downloads release `r5` of the Axiom UK Biobank (`Axiom_UKB_WCSG`) library f
 About 325 MB of downloads expanding to roughly 2.5 GB, most of it the annotation database.
 Re-running is a no-op once the files are present and match.
 
-Use `--what all` to do this and the container in one go.
+Use `--what all` to do this, the container, and the test data below in one go.
 
 **It is ten files, not the three the config names.** The arg file is an XML document that references seven further library files (`.cdf`, `specialSNPs`, `chrXprobes`, `chrYprobes`, `AxiomGT1.sketch`, `AxiomGT1.models`, `snp_specific_parameters.txt`) by bare filename.
 APT resolves those against `--analysis-files-path`, which the `apt` rule sets to the directory containing the arg file — so all ten have to sit in that one directory.
@@ -78,6 +78,24 @@ Members of project `a56` do not normally need this step — these files come fro
 
 Only `array_type: UKB` is supported.
 The Axiom Precision Medicine Diversity Array (`PMDA`) needs more than a different set of downloads: it has no `ps2snp_map.ps` (the equivalent is `ps2multisnp_map.ps`) and uses a different annotation build, and the workflow does not handle either yet — see the `TODO` in [`workflow/rules/apt.smk`](../workflow/rules/apt.smk).
+
+## Fetching the test data
+
+The test dataset is four human iPSC lines from [GEO series GSE224950](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224950), run on the same Axiom UK Biobank array and deposited by the Powell lab at the Garvan Institute for [Neavin et al. 2023](https://pubmed.ncbi.nlm.nih.gov/37296104/).
+They are fetched from GEO rather than shipped here:
+```
+./prep.sh --what testdata
+```
+About 50 MB of downloads expanding to roughly 115 MB, into `test/data/`, which is where [`config/donors.csv`](../config/donors.csv) points.
+The files are verified against [`test/data/gse224950.sha256`](../test/data/gse224950.sha256), which also records which samples these are and why.
+
+APT cannot read gzipped CEL files, so `prep.sh` expands them; GEO serves them gzipped.
+
+The four lines are two female and two male, so the sex calls in the `.psam` are exercised rather than being uniform.
+The series has twenty lines in total, and the subset is set by the manifest — adding a line means adding its checksum there and a row to `config/donors.csv`.
+
+Note that [`config/test.yaml`](../config/test.yaml) puts the array files in `resources/axiom/` rather than the `resources/genotyping/` used by the lab's own datasets, because the latter is a DVC import from a private repository.
+The genome references in `refs.genomes` are still pulled from the DVC remote, which is internal to project `a56`.
 
 ## Profiles
 
@@ -102,6 +120,20 @@ In fact, the `run_mod.sh` script accepts and passes on any and all snakemake opt
 If specified, such options will over-ride the default options in both `run_mod.sh` and in the profiles above.
 
 This can be useful if you need to provide extra resources (such as memory) to a particular rule but don't want to update the profile, for example.
+
+## Test run
+
+To run the workflow standalone against the test dataset, from the top of this repository:
+```
+./prep.sh --what all --configfile config/test.yaml
+./run_test.sh
+```
+[`run_test.sh`](../run_test.sh) is the same wrapper as `run_mod.sh` but points at `workflow/Snakefile` and [`config/test.yaml`](../config/test.yaml) in place of the submodule paths, and it too passes on any snakemake options — so `./run_test.sh --dry-run` works.
+Outputs land in `test/results/`.
+
+A full run on Gadi took 57 minutes of wall clock for these four samples, of which roughly half was queue wait.
+`otv_caller` is the longest rule at about 22 minutes, followed by `make_vcf` at 6 and `apt` at 3.
+Adding samples costs little: `otv_caller`'s and `make_vcf`'s work is driven by the number of probesets, not the number of samples.
 
 ## Running as part of a DVC super pipeline
 

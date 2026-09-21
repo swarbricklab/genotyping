@@ -36,6 +36,9 @@ The same script fetches them, into the directory holding `refs.apt.arg_file`:
 Note that APT reads ten files from that directory even though only three are named here — see [fetching the Axiom array files](../docs/run.md#fetching-the-axiom-array-files).
 Members of project `a56` get these from the DVC remote instead.
 
+The same script also fetches the `.CEL` files for the test dataset, with `--what testdata`; `--what all` does all three stages.
+Those are only needed to run [`config/test.yaml`](test.yaml), not your own dataset.
+
 The value in the template is the image used for our published runs, and its registry repository is private, so it will not pull without credentials.
 That fallback is deliberate -- it keeps existing dataset configs resolving to the exact image their results came from -- but it means an authentication error on the first APT rule indicates that `containers.apt` has not been set.
 See [`containers/apt/README.md`](../containers/apt/README.md).

@@ -86,9 +86,20 @@ The remaining rules use openly licensed containers: [bcftools](https://github.co
 
 ## Test data
 
-The `.CEL` files under `test/` and the reference data under `resources/` are tracked with [DVC](https://dvc.org/) against a remote hosted on the NCI Gadi system, which is accessible only to members of project `a56`.
-The test `.CEL` files are SNP microarray measurements from human donors and are therefore potentially identifiable; they are **not** publicly redistributable.
-Researchers wishing to reproduce the test run should refer to the data availability statement of the associated publication.
+The test dataset is four human induced pluripotent stem cell lines from [GEO series GSE224950](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224950), run on the same Axiom UK Biobank array as our own data and deposited by the Powell lab at the Garvan Institute for [Neavin et al. 2023](https://pubmed.ncbi.nlm.nih.gov/37296104/).
+Two are female and two male, so the sex calls in the `.psam` are exercised.
+
+These `.CEL` files are not redistributed here.
+They are fetched from GEO and checked against recorded checksums by [`prep.sh`](prep.sh):
+```
+./prep.sh --what testdata
+```
+See [fetching the test data](docs/run.md#fetching-the-test-data).
+
+Earlier releases tested against SNP microarray measurements from our own donors, which are potentially identifiable and not publicly redistributable.
+Those files are no longer referenced here; researchers wanting them should refer to the data availability statement of the associated publication.
+
+The reference data under `resources/` is still tracked with [DVC](https://dvc.org/) against a remote hosted on the NCI Gadi system, accessible only to members of project `a56`, so the test run is not yet reproducible end to end outside the lab.
 
 The workflow itself does not depend on this data -- it can be run on any set of Axiom `.CEL` files by pointing the config file at them.
 

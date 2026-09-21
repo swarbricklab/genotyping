@@ -1,18 +1,19 @@
 #! /bin/bash
 
 # Prepare the local dependencies that cannot be fetched by the workflow itself,
-# because they are supplied by Thermo Fisher under terms that do not let us
-# redistribute them: the APT container image, and the Axiom array library and
-# annotation files.
+# because they are supplied by third parties under terms that do not let us
+# redistribute them: the APT container image, the Axiom array library and
+# annotation files, and the CEL files for the test dataset.
 #
 # Usage:
 #   ./prep.sh --configfile config/genotyping/config.yaml [--what all] [options]
 #
 # Options:
-#   --what STAGE        What to prepare: container, resources, or all.
+#   --what STAGE        What to prepare: container, resources, testdata, or all.
 #                       Default: container.
 #   --configfile PATH   Config file to read paths from. Required unless the
-#                       relevant --target/--resources-dir is given.
+#                       relevant --target/--resources-dir is given. The
+#                       testdata stage never reads it.
 #   --force             Redo work even if the outputs already look complete.
 #
 # container stage:
@@ -41,6 +42,10 @@
 #                       holding refs.apt.arg_file in the config.
 #   --array TYPE        Array type. Only UKB is supported (see below).
 #
+# testdata stage:
+#   --testdata-dir DIR  Write the test CEL files here instead of test/data next
+#                       to this script, which is where config/donors.csv points.
+#
 # Paths are interpreted relative to the current directory, which is how
 # Snakemake resolves these config values as well. Run this from the top of the
 # super-project, the same place you run run_mod.sh.
@@ -57,6 +62,7 @@ apt_sha256=""
 accept_eula="false"
 resources_dir=""
 array="UKB"
+testdata_dir=""
 force="false"
 
 # The Dockerfile and checksum manifest live next to this script, so the
@@ -79,15 +85,16 @@ while [[ $# -gt 0 ]]; do
         --accept-eula)    accept_eula="true"; shift ;;
         --resources-dir)  resources_dir="${2:-}"; shift 2 ;;
         --array)          array="${2:-}"; shift 2 ;;
+        --testdata-dir)   testdata_dir="${2:-}"; shift 2 ;;
         --force)          force="true"; shift ;;
-        -h|--help)        sed -n '3,46p' "${BASH_SOURCE[0]}" | cut -c 3-; exit 0 ;;
+        -h|--help)        sed -n '3,51p' "${BASH_SOURCE[0]}" | cut -c 3-; exit 0 ;;
         *)                die "unknown argument: $1" ;;
     esac
 done
 
 case "$what" in
-    container|resources|all) ;;
-    *) die "--what must be container, resources or all (got: $what)" ;;
+    container|resources|testdata|all) ;;
+    *) die "--what must be container, resources, testdata or all (got: $what)" ;;
 esac
 
 # Resolve the download URL and checksum for a requested version. The URL is not
@@ -360,6 +367,71 @@ EOF
 }
 
 
+prep_testdata() {
+    local manifest="$here/test/data/gse224950.sha256"
+    [[ -f "$manifest" ]] || die "checksum manifest not found: $manifest"
+
+    # config/donors.csv names these as test/data/*.CEL, relative to the
+    # directory the workflow is run from. For the standalone test that is the
+    # top of this repository, so test/data next to this script is the same
+    # place. Anything else has its own sample sheet and does not want these.
+    [[ -n "$testdata_dir" ]] || testdata_dir="$here/test/data"
+
+    mkdir -p "$testdata_dir"
+
+    if [[ "$force" != "true" ]] && (cd "$testdata_dir" && sha256sum -c --quiet "$manifest" > /dev/null 2>&1); then
+        echo "$testdata_dir already holds the test CEL files, and they match the recorded checksums."
+        echo "Nothing to do (use --force to re-download)."
+        return 0
+    fi
+
+    cat <<EOF
+Downloading the test CEL files from GEO series GSE224950 into $testdata_dir
+
+Four hiPSC lines run on the same Axiom UK Biobank array, deposited by the Powell
+lab at the Garvan Institute. About 50 MB of downloads expanding to roughly
+115 MB. See test/data/gse224950.sha256 for the samples and their provenance.
+
+EOF
+
+    local sum name gsm stem
+    # Read the filenames from the manifest so there is one list, not two.
+    # Skip the comment block, which sha256sum -c ignores but `read` would not:
+    # its second field is a word of prose, not a filename.
+    while read -r sum name; do
+        [[ -n "$name" && "$sum" != "#"* ]] || continue
+        # Match the manifest line on an exact filename, so that one name being
+        # a suffix of another could not select the wrong checksum.
+        if [[ "$force" != "true" && -f "$testdata_dir/$name" ]] \
+           && (cd "$testdata_dir" && awk -v n="$name" '$2 == n' "$manifest" | sha256sum -c --quiet - > /dev/null 2>&1); then
+            echo "  have    $name"
+            continue
+        fi
+        echo "  fetch   $name"
+        # GEO files are named GSMxxxxxxx_<line>.CEL.gz and live under a
+        # directory for their thousand-block, e.g. GSM7036154 -> GSM7036nnn.
+        stem="${name%.CEL}"
+        gsm="${stem%%_*}"
+        curl -fsSL --retry 3 -o "$testdata_dir/$name.gz" \
+            "https://ftp.ncbi.nlm.nih.gov/geo/samples/${gsm:0:$(( ${#gsm} - 3 ))}nnn/$gsm/suppl/$stem.CEL.gz" \
+            || die "could not download $stem.CEL.gz from GEO. Check https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=$gsm"
+        # APT cannot read gzipped CEL files -- apt-genotype-axiom fails with
+        # "Cannot read cel file" -- so they have to be expanded, not just placed.
+        gunzip -f "$testdata_dir/$name.gz" \
+            || die "could not decompress $testdata_dir/$name.gz"
+    done < "$manifest"
+
+    echo
+    echo "Verifying checksums"
+    (cd "$testdata_dir" && sha256sum -c --quiet "$manifest") \
+        || die "downloaded files do not match the recorded checksums in $manifest. GEO replaces supplementary files in place, so the deposit may have changed since those were recorded."
+
+    echo "  all files match"
+    echo
+    echo "Done. config/donors.csv should resolve under: $testdata_dir"
+}
+
+
 if [[ "$what" == "container" || "$what" == "all" ]]; then
     prep_container
 fi
@@ -367,6 +439,11 @@ fi
 if [[ "$what" == "resources" || "$what" == "all" ]]; then
     [[ "$what" == "all" ]] && echo
     prep_resources
+fi
+
+if [[ "$what" == "testdata" || "$what" == "all" ]]; then
+    [[ "$what" == "all" ]] && echo
+    prep_testdata
 elif [[ "$what" == "container" ]]; then
-    echo "(to also fetch the Axiom array files, re-run with --what resources)"
+    echo "(to also fetch the Axiom array files and the test data, re-run with --what all)"
 fi

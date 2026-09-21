@@ -2,7 +2,15 @@
 
 # Dependencies
 deps:
-  # Sample sheet. See README for column specifications
+  # Sample sheet. See README for column specifications.
+  #
+  # The CEL files it names are four hiPSC lines from GEO series GSE224950,
+  # deposited by the Powell lab for Neavin et al. 2023. They are not shipped
+  # here; fetch them with
+  #
+  #   ./prep.sh --what testdata
+  #
+  # See test/data/gse224950.sha256 for the samples and their provenance.
   donors: config/donors.csv
 
 # Container images
@@ -19,10 +27,18 @@ refs:
     hg19: "resources/genomes/hg19/hg19.fa.gz"
     hg38: "resources/genomes/refdata-gex-GRCh38-2020-A/fasta/genome.fa"
     chain: "resources/liftover/hg19ToHg38.over.chain.gz"
+  # Axiom array files, fetched from Thermo Fisher by
+  #
+  #   ./prep.sh --what resources --configfile config/test.yaml
+  #
+  # which reads arg_file below to decide where they go. This deliberately does
+  # not reuse resources/genotyping: that is a DVC import from a private lab
+  # repository, so pointing the test at it would make the test unrunnable for
+  # anyone outside the lab.
   apt:
-    arg_file: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml"
-    ps2snp: "resources/genotyping/annotation/Axiom_UKB_WCSG.r5.ps2snp_map.ps"
-    annotation: "resources/genotyping/annotation/Axiom_UKB_WCSG.na35.annot.db"
+    arg_file: "resources/axiom/Axiom_UKB_WCSG.r5.apt-genotype-axiom.AxiomCN_GT1.apt2.xml"
+    ps2snp: "resources/axiom/Axiom_UKB_WCSG.r5.ps2snp_map.ps"
+    annotation: "resources/axiom/Axiom_UKB_WCSG.na35.annot.db"
 
 # Outputs
 outs:

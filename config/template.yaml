@@ -17,6 +17,33 @@ outs:
   id_map: "data/snp/genotyping/id_map.tsv"
   logs: "logs/snp/genotyping"
 
+# Container images
+containers:
+  # Image providing Analysis Power Tools (APT) and SNPolisher.
+  #
+  # APT is proprietary software that cannot be redistributed with this
+  # workflow, so you have to supply this image yourself. Build one with the
+  # Dockerfile in containers/apt/ (see containers/apt/README.md), then point
+  # this at it -- either a registry reference, or the path to a local
+  # Singularity image:
+  #
+  #   apt: "docker://your-registry/apt:2.12.0"
+  #   apt: "containers/apt-2.12.0.sif"
+  #
+  # Set this first, then run prep.sh to populate it:
+  #
+  #   ./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml
+  #
+  # A local path must be a Singularity image file, not a docker save tarball:
+  # Snakemake runs every container through Singularity, even docker:// ones.
+  #
+  # The value below is the image used for our published runs. It is a private
+  # registry repository and will not pull without credentials, so replace it.
+  # Note that it contains apt-genotype-axiom 2.10.0. ThermoFisher still
+  # publishes 2.10.0, so `prep.sh --apt-version 2.10.0` builds an image that
+  # reproduces the calling step (see containers/apt/README.md).
+  apt: "docker://swarbricklab/ctp-tools:apt-2.10.2"
+
 # References
 refs:
   genomes:

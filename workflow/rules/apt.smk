@@ -16,7 +16,7 @@ rule apt:
         console=logs/"apt/console.log",
         axiom=logs/"apt/apt-genotype-axiom.log"
     container: 
-        "docker://swarbricklab/ctp-tools:apt-2.10.2"
+        apt_container
     shell:
         # NOTE: for now I'm assuming the SNP file format is UKB
         #       - TODO: make more generic to process the PMDA array type
@@ -49,7 +49,7 @@ rule ps_metrics:
         ps=logs/"ps_metrics/ps_metrics.log",
         console=logs/"ps_metrics/console.log"
     container: 
-        "docker://swarbricklab/ctp-tools:apt-2.10.2"
+        apt_container
     shell:
         """
         ps-metrics --posterior-file {input.axiom_snp_posteriors} \
@@ -75,7 +75,7 @@ rule ps_classification:
         ps=logs/"ps_classification/ps_classification.log",
         console=logs/"ps_classification/console.log"
     container: 
-        "docker://swarbricklab/ctp-tools:apt-2.10.2"
+        apt_container
     shell:
         """
         ps-classification --species-type human \
@@ -104,7 +104,7 @@ rule otv_caller:
         otv=logs/"otv_caller/otv_caller.log",
         console=logs/"otv_caller/console.log"
     container: 
-        "docker://swarbricklab/ctp-tools:apt-2.10.2"
+        apt_container
     shell:
         """
         otv-caller --pid-file {input.recommended} \
@@ -131,7 +131,7 @@ rule make_vcf:
         apt=logs/"make_vcf/apt_format_result.log",
         console=logs/"make_vcf/console.log"
     container: 
-        "docker://swarbricklab/ctp-tools:apt-2.10.2"
+        apt_container
     shell:
         """
         data_dir=$(realpath --relative-to {input.otv_dir} {input.data_dir})

@@ -18,6 +18,20 @@ Next, check the paths in the config file and edit if needed.
 In many cases, the template can be left unchanged.
 Refer to the comments in the template for the meaning for each item.
 
+One item usually does need changing: **`containers.apt`**.
+This names the container image providing Analysis Power Tools (APT) and SNPolisher, which are proprietary and cannot be redistributed with this workflow.
+Build your own image with the [`Dockerfile`](../containers/apt/Dockerfile) in `containers/apt/` and set `containers.apt` to either a registry reference or the path of a local Singularity image.
+
+Once this is set, run [`prep.sh`](../prep.sh) to populate it before the first run — it reads this same key, so the two cannot drift apart:
+```
+./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml
+```
+See [preparing the APT container](../docs/run.md#preparing-the-apt-container).
+
+The value in the template is the image used for our published runs, and its registry repository is private, so it will not pull without credentials.
+That fallback is deliberate -- it keeps existing dataset configs resolving to the exact image their results came from -- but it means an authentication error on the first APT rule indicates that `containers.apt` has not been set.
+See [`containers/apt/README.md`](../containers/apt/README.md).
+
 ### Sample sheet
 
 The sample sheet links donors to the `.CEL` file for each donor sample.

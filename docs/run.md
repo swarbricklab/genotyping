@@ -12,6 +12,46 @@ conda env create -f env/snakemake_7.32.4.yaml
 ```
 ([Install conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) first if necessary.)
 
+## Preparing the APT container
+
+Five of the rules call Analysis Power Tools (APT), which is proprietary and cannot be redistributed with this workflow.
+You have to supply that container image yourself, so there is one preparation step before the first run:
+```
+./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml
+```
+This reads `containers.apt` from the config file and makes sure a usable image exists at that location, so the script and the workflow cannot disagree about where to look.
+It is safe to re-run: if the image is already there it does nothing.
+
+What it does depends on what `containers.apt` holds:
+
+| `containers.apt` | What `prep.sh` does |
+|------------------|---------------------|
+| a registry reference (`docker://...`) | Nothing to place on disk — checks that the reference can actually be pulled |
+| a local path (`containers/apt.sif`) | Builds the image and writes it there, then verifies APT runs inside it |
+
+By default it builds from the [`Dockerfile`](../containers/apt/Dockerfile), which needs `docker` (or `podman`).
+**NCI Gadi has Singularity but no Docker**, and Singularity cannot build from a Dockerfile, so on Gadi you cannot use that default.
+Build the image on a machine that does have Docker, then give `prep.sh` the result.
+[`build.sh`](../containers/apt/build.sh) prompts for EULA acceptance, builds (setting `--platform linux/amd64`, which matters on Apple Silicon) and saves the tarball:
+```
+# on a machine with docker
+./modules/genotyping/containers/apt/build.sh          # writes apt-2.12.0.tar
+
+# on Gadi, after copying the archive across
+./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml --from apt-2.12.0.tar
+```
+Or by hand — the build fails without the EULA acknowledgement:
+```
+docker build --build-arg ACCEPT_THERMOFISHER_EULA=yes -t apt:2.12.0 modules/genotyping/containers/apt
+docker save apt:2.12.0 -o apt-2.12.0.tar
+```
+Or, if you have pushed the image to a registry you control, pull it directly — this needs no Docker at all:
+```
+./modules/genotyping/prep.sh --configfile config/genotyping/config.yaml --from docker://your-registry/apt:2.12.0
+```
+Since APT cannot be redistributed, any registry you use has to be your own.
+See [`containers/apt/README.md`](../containers/apt/README.md) for the licensing background and `prep.sh --help` for all options.
+
 ## Profiles
 
 This workflow provides two [profiles](https://github.com/swarbricklab/snakemake_config?tab=readme-ov-file#profiles):

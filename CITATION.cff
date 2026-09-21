@@ -12,15 +12,36 @@ authors:
   - given-names: John
     family-names: Reeves
     affiliation: "Garvan Institute of Medical Research"
-    email: j.reeves@garvan.org.au
     alias: johnyaku
-    # orcid: "https://orcid.org/0000-0000-0000-0000"   # TODO: add ORCID
-  # TODO: confirm and complete the author list before release.
-  # The workflow's lineage (see the "Authors" section of README.md) also
-  # involves @nbartonicek (original bash/SGE scripts) and @dlroden and
-  # @BeataKiedik (souporcell / demuxafy refactors). Add whichever should be
-  # credited as software authors, each with given-names / family-names and
-  # ideally an orcid, in the agreed order.
+    orcid: "https://orcid.org/0000-0001-7368-7489"
+  - given-names: James
+    family-names: Douglas
+    affiliation: "Garvan Institute of Medical Research"
+    alias: jd-garv
+    orcid: "https://orcid.org/0009-0004-2559-026X"
+  - given-names: Nenad
+    family-names: Bartonicek
+    affiliation: "Peter MacCallum Cancer Centre"
+    alias: nbartonicek
+    orcid: "https://orcid.org/0000-0003-2144-1887"
+  - given-names: Daniel
+    family-names: Roden
+    alias: dlroden
+    orcid: "https://orcid.org/0000-0003-2393-5805"
+  - given-names: Beata
+    family-names: Myler
+    affiliation: "Adelaide University"
+    alias: BeataKiedik
+    orcid: "https://orcid.org/0000-0001-8517-5253"
+  - given-names: Victor
+    family-names: Liu
+    affiliation: "Garvan Institute of Medical Research"
+    alias: vliu378
+    orcid: "https://orcid.org/0009-0008-7628-7825"
+  - given-names: Alexander
+    family-names: Swarbrick
+    affiliation: "Garvan Institute of Medical Research"
+    orcid: "https://orcid.org/0000-0002-3051-5676"
 repository-code: "https://github.com/swarbricklab/genotyping"
 url: "https://github.com/swarbricklab/genotyping"
 license: MIT

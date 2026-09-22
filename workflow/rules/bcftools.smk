@@ -16,7 +16,12 @@ rule format_vcf:
         "docker://quay.io/biocontainers/bcftools:1.21--h8b25389_0"
     shell:
         """
-        grep -v UNKNOWNPOSITION {input.vcf} \
+        # Drop apt-format-result's no-position control-probe markers. The tag
+        # is spelled UNKNOWNPOSITION by APT 2.10.2.x but UKNOWNPOSITION (sic)
+        # by 2.10.0, and the marker line is otherwise invalid (POS 0, an
+        # overflowed CHROM), so bcftools chokes on it if it survives. Match
+        # the common substring to catch both spellings.
+        grep -v KNOWNPOSITION {input.vcf} \
             | bcftools reheader --fai {input.int_fai_hg19} \
             | bcftools reheader -s {input.donors} \
             | bcftools annotate --rename-chrs {input.intxy_map} \

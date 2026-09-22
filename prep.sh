@@ -9,8 +9,8 @@
 #   ./prep.sh --configfile config/genotyping/config.yaml [--what all] [options]
 #
 # Options:
-#   --what STAGE        What to prepare: container, resources, testdata, or all.
-#                       Default: container.
+#   --what STAGE        What to prepare: container, resources, testdata, all, or
+#                       check (a read-only preflight). Default: container.
 #   --configfile PATH   Config file to read paths from. Required unless the
 #                       relevant --target/--resources-dir is given. The
 #                       testdata stage never reads it.
@@ -45,6 +45,13 @@
 # testdata stage:
 #   --testdata-dir DIR  Write the test CEL files here instead of test/data next
 #                       to this script, which is where config/donors.csv points.
+#
+# check stage (preflight):
+#   Read-only. Verifies the APT container is available (reporting its APT
+#   version and image identity) and that the array files, genome references
+#   and the sample sheet's CEL files are present. Fetches and builds nothing,
+#   and exits non-zero if anything is missing, so it can gate a run:
+#     ./prep.sh --what check --configfile <config>
 #
 # Paths are interpreted relative to the current directory, which is how
 # Snakemake resolves these config values as well. Run this from the top of the
@@ -87,14 +94,14 @@ while [[ $# -gt 0 ]]; do
         --array)          array="${2:-}"; shift 2 ;;
         --testdata-dir)   testdata_dir="${2:-}"; shift 2 ;;
         --force)          force="true"; shift ;;
-        -h|--help)        sed -n '3,51p' "${BASH_SOURCE[0]}" | cut -c 3-; exit 0 ;;
+        -h|--help)        sed -n '3,58p' "${BASH_SOURCE[0]}" | cut -c 3-; exit 0 ;;
         *)                die "unknown argument: $1" ;;
     esac
 done
 
 case "$what" in
-    container|resources|testdata|all) ;;
-    *) die "--what must be container, resources, testdata or all (got: $what)" ;;
+    container|resources|testdata|all|check) ;;
+    *) die "--what must be container, resources, testdata, all or check (got: $what)" ;;
 esac
 
 # Resolve the download URL and checksum for a requested version. The URL is not
@@ -431,6 +438,141 @@ EOF
     echo "Done. config/donors.csv should resolve under: $testdata_dir"
 }
 
+
+# Read-only preflight: confirm the dependencies a run needs are already in
+# place, without fetching or building anything. Reports the APT version and
+# image identity, and checks the array files, genome references and the sample
+# sheet's CEL files. Reuses the same config keys and manifest as the stages
+# above, so it checks exactly what the workflow will look for, and exits
+# non-zero if anything is missing so a super-project can gate a run on it.
+preflight() {
+    [[ -n "$configfile" ]] || die "give --configfile (see --help)."
+
+    local fails=0
+    ok()  { echo "  ok    $1"; }
+    bad() { echo "  FAIL  $1"; fails=$((fails + 1)); }
+
+    echo "Preflight for $configfile (read-only; fetches and builds nothing)"
+    echo
+
+    # 1. APT container: available, and reporting its version and identity.
+    echo "APT container (containers.apt):"
+    local apt; apt="$(config_value '.containers.apt')"
+    if [[ -z "$apt" ]]; then
+        bad "containers.apt is not set"
+    elif ! command -v singularity > /dev/null; then
+        bad "singularity not found, so the container cannot be checked ($apt)"
+    else
+        local reachable="false" ident="" probe_target="$apt"
+        if [[ "$apt" == *"://"* ]]; then
+            if singularity exec "$apt" true > /dev/null 2>&1; then
+                reachable="true"; ident="registry reference $apt"
+            fi
+        elif [[ -f "$apt" ]]; then
+            reachable="true"
+            ident="$apt (sha256 $(sha256sum "$apt" | cut -c1-12))"
+            # Resolve to an absolute path: the probe cd's to a scratch dir
+            # (apt-genotype-axiom writes a log into the working directory), so a
+            # relative image path would not resolve from there.
+            probe_target="$(cd "$(dirname "$apt")" && pwd)/$(basename "$apt")"
+        fi
+        if [[ "$reachable" != "true" ]]; then
+            bad "not available: $apt -- build or pull it with 'prep.sh --what container'"
+        else
+            local probe ver
+            probe="$(mktemp -d)"
+            ver="$(cd "$probe" && singularity exec "$probe_target" apt-genotype-axiom --version 2>&1 \
+                | grep -m1 'Version:' || true)"
+            rm -rf "$probe"
+            if [[ -n "$ver" ]]; then
+                ok "$ident"
+                ok "apt-genotype-axiom ${ver#*Version: }"
+            else
+                bad "$apt is present but apt-genotype-axiom did not report a version"
+            fi
+        fi
+    fi
+    echo
+
+    # 2. Axiom array library and annotation files (all of them, by manifest).
+    echo "Axiom array files (refs.apt):"
+    local arg_file manifest="$here/resources/axiom_ukb_wcsg_r5.sha256"
+    arg_file="$(config_value '.refs.apt.arg_file')"
+    if [[ -z "$arg_file" ]]; then
+        bad "refs.apt.arg_file is not set"
+    elif [[ ! -f "$manifest" ]]; then
+        bad "checksum manifest missing: $manifest"
+    else
+        local rdir missing=0 total=0 nm _h
+        rdir="$(dirname "$arg_file")"
+        while read -r _h nm || [[ -n "$_h" ]]; do
+            [[ -n "$nm" ]] || continue
+            total=$((total + 1))
+            [[ -s "$rdir/$nm" ]] || missing=$((missing + 1))
+        done < "$manifest"
+        if [[ "$missing" -eq 0 ]]; then
+            ok "all $total library/annotation files present under $rdir"
+        else
+            bad "$missing of $total files missing under $rdir -- fetch with 'prep.sh --what resources'"
+        fi
+    fi
+    echo
+
+    # 3. Genome references (DVC-tracked; "available" means checked out).
+    echo "Genome references (refs.genomes):"
+    local hg19 hg38 chain
+    hg19="$(config_value '.refs.genomes.hg19')"
+    hg38="$(config_value '.refs.genomes.hg38_chromosomes')"
+    chain="$(config_value '.refs.genomes.chain')"
+    if [[ -z "$hg19" ]]; then bad "refs.genomes.hg19 not set"
+    elif [[ -s "$hg19" ]]; then ok "hg19: $hg19"
+    else bad "hg19 missing: $hg19 -- 'dvc pull' the references"; fi
+    if [[ -z "$hg38" ]]; then bad "refs.genomes.hg38_chromosomes not set"
+    elif [[ -d "$hg38" ]]; then
+        local n; n="$(find "$hg38" -maxdepth 1 -name '*.fa.gz' 2>/dev/null | wc -l)"
+        if [[ "$n" -ge 1 ]]; then ok "hg38 chromosomes: $hg38 ($n FASTA files)"
+        else bad "hg38 directory has no FASTA files: $hg38 -- 'dvc pull'"; fi
+    else bad "hg38 chromosomes directory missing: $hg38 -- 'dvc pull'"; fi
+    if [[ -z "$chain" ]]; then bad "refs.genomes.chain not set"
+    elif [[ -s "$chain" ]]; then ok "chain: $chain"
+    else bad "chain missing: $chain -- 'dvc pull'"; fi
+    echo
+
+    # 4. Sample sheet and the CEL files it names.
+    echo "Sample sheet and inputs (deps.donors):"
+    local donors; donors="$(config_value '.deps.donors')"
+    if [[ -z "$donors" ]]; then bad "deps.donors not set"
+    elif [[ ! -f "$donors" ]]; then bad "sample sheet missing: $donors"
+    else
+        ok "sample sheet: $donors"
+        local missing=0 total=0 d cel rest
+        while IFS=, read -r d cel rest || [[ -n "$d" ]]; do
+            [[ -z "$cel" || "$cel" == "cel_files" ]] && continue
+            total=$((total + 1))
+            [[ -s "$cel" ]] || missing=$((missing + 1))
+        done < "$donors"
+        if [[ "$total" -eq 0 ]]; then
+            bad "no cel_files entries found in $donors"
+        elif [[ "$missing" -eq 0 ]]; then
+            ok "all $total CEL file(s) present"
+        else
+            bad "$missing of $total CEL file(s) missing -- check paths, or 'prep.sh --what testdata' for the test set"
+        fi
+    fi
+    echo
+
+    if [[ "$fails" -eq 0 ]]; then
+        echo "Preflight OK: all dependencies are in place."
+    else
+        die "preflight found $fails problem(s) above; resolve them before running."
+    fi
+}
+
+
+if [[ "$what" == "check" ]]; then
+    preflight
+    exit 0
+fi
 
 if [[ "$what" == "container" || "$what" == "all" ]]; then
     prep_container

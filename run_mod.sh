@@ -20,6 +20,18 @@ else
     global_profile=""
 fi
 
+# Preflight: verify the APT container and the reference / array / CEL
+# dependencies are in place before building the rule graph or submitting any
+# jobs. Set SKIP_PREFLIGHT=1 to bypass (e.g. if you know they are present, or
+# singularity is unavailable on this node). This runs before the rule graph
+# because that step also needs the inputs resolvable, so a missing dependency
+# gives a clear report here rather than a confusing snakemake/dot failure.
+if [[ -z "${SKIP_PREFLIGHT:-}" ]]; then
+    modules/$module/prep.sh --what check --configfile config/$module/config.yaml
+else
+    echo "SKIP_PREFLIGHT set -- skipping the dependency preflight."
+fi
+
 # Make rule graph
 mkdir -p docs/graphs
 snakemake $global_profile $workflow_profile \

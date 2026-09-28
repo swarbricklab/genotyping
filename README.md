@@ -1,5 +1,7 @@
 # Genotyping
 
+[![DOI](https://zenodo.org/badge/881657744.svg)](https://doi.org/10.5281/zenodo.23006334)
+
 This workflow creates a VCF file based on the SNP microarray data in a set of `.CEL` files.
 This VCF file can be used for demultiplexing 10X scRNA-seq data where multiple samples have been "pooled" and captured together.
 

@@ -1,0 +1,54 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+description: >-
+  genotyping configuration. Validated at workflow start via
+  snakemake.utils.validate() in the Snakefile.
+type: object
+properties:
+  deps:
+    type: object
+    properties:
+      donors:
+        type: string
+        description: Path to donors.csv (donor, cel_files, array_type).
+      cel:
+        type: string
+        description: Documentation-only example CEL dir; not read by any rule.
+    required: [donors]
+  containers:
+    type: object
+    properties:
+      apt:
+        type: string
+        minLength: 1
+        description: APT container (docker:// ref or .sif path). Must be non-empty.
+    required: [apt]
+  refs:
+    type: object
+    properties:
+      genomes:
+        type: object
+        properties:
+          hg19: {type: string, description: hg19 genome FASTA (.fa.gz).}
+          hg38_chromosomes:
+            type: string
+            description: Directory of Ensembl GRCh38 per-chromosome FASTAs.
+          chain: {type: string, description: hg19->hg38 liftover chain (.chain.gz).}
+        required: [hg19, hg38_chromosomes, chain]
+      apt:
+        type: object
+        properties:
+          arg_file: {type: string, description: APT genotype argument XML.}
+          ps2snp: {type: string, description: probeset->SNP map (.ps).}
+          annotation: {type: string, description: Axiom annotation db.}
+        required: [arg_file, ps2snp, annotation]
+    required: [genomes, apt]
+  outs:
+    type: object
+    properties:
+      vcf_hg19: {type: string}
+      vcf_hg38: {type: string}
+      psam: {type: string}
+      id_map: {type: string}
+      logs: {type: string}
+    required: [vcf_hg19, vcf_hg38, psam, id_map, logs]
+required: [deps, containers, refs, outs]

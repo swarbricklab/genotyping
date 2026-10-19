@@ -1,0 +1,51 @@
+name: CI
+
+# Lightweight, data-independent checks: they need no real CEL/reference data, so
+# they run on every push/PR (and on forks). Real end-to-end testing needs the
+# proprietary APT image + Axiom references, which can't live in public CI.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: ci
+          # snakefmt + go-shfmt pinned so the format check is reproducible
+          # (snakefmt formats shell: blocks via shfmt, so both must match).
+          create-args: >-
+            snakemake=7.32.4
+            snakefmt=2.1.0
+            go-shfmt=3.14.1
+            pandas
+            numpy
+            jsonschema
+          condarc: |
+            channels:
+              - conda-forge
+              - bioconda
+
+      - name: Touch placeholder inputs
+        run: bash .tests/ci/setup_placeholders.sh
+
+      - name: Dry-run (builds the full DAG + validates config against the schema)
+        run: >-
+          snakemake -n --forceall
+          --snakefile workflow/Snakefile
+          --configfile config/test.yaml
+
+      - name: snakefmt check
+        run: snakefmt --check workflow/
+
+      - name: snakemake lint (informational)
+        continue-on-error: true
+        run: snakemake --lint --snakefile workflow/Snakefile --configfile config/test.yaml

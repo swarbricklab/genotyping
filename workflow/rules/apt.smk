@@ -2,20 +2,21 @@
 rule apt:
     """
     Runs Affymetrix Power Tools (APT) to perform genotyping on SNP arrays using the provided CEL files and annotation.
+
     """
     input:
-        cel_list=out_dir/"cel_list.txt",
-        arg_file=config['refs']['apt']['arg_file']
+        cel_list=out_dir / "cel_list.txt",
+        arg_file=config["refs"]["apt"]["arg_file"],
     output:
-        axiom_calls=temp(out_dir/"apt/AxiomGT1.calls.txt"),
-        axiom_snp_posteriors=temp(out_dir/"apt/AxiomGT1.snp-posteriors.txt"),
-        apt_report=out_dir/"apt/AxiomGT1.report.txt",
-        axiom_dir=temp(directory(out_dir/"apt")),
-        data_dir=temp(directory(out_dir/"apt/AxiomAnalysisSuiteData"))
+        axiom_calls=temp(out_dir / "apt/AxiomGT1.calls.txt"),
+        axiom_snp_posteriors=temp(out_dir / "apt/AxiomGT1.snp-posteriors.txt"),
+        apt_report=out_dir / "apt/AxiomGT1.report.txt",
+        axiom_dir=temp(directory(out_dir / "apt")),
+        data_dir=temp(directory(out_dir / "apt/AxiomAnalysisSuiteData")),
     log:
-        console=logs/"apt/console.log",
-        axiom=logs/"apt/apt-genotype-axiom.log"
-    container: 
+        console=logs / "apt/console.log",
+        axiom=logs / "apt/apt-genotype-axiom.log",
+    container:
         apt_container
     shell:
         # NOTE: for now I'm assuming the SNP file format is UKB
@@ -32,23 +33,25 @@ rule apt:
             --summaries --write-models \
             --console-add-neg-select WARNING,summary,debug \
             --log-file {log.axiom} \
-            > {log.console} 2>&1
+            >{log.console} 2>&1
         """
+
 
 # Run SNPolisher ps-metrics
 rule ps_metrics:
     """
     Runs SNPolisher to generate performance metrics for SNPs using posterior and call files.
+
     """
     input:
-        axiom_snp_posteriors=out_dir/"apt/AxiomGT1.snp-posteriors.txt",
-        axiom_calls=out_dir/"apt/AxiomGT1.calls.txt"
+        axiom_snp_posteriors=out_dir / "apt/AxiomGT1.snp-posteriors.txt",
+        axiom_calls=out_dir / "apt/AxiomGT1.calls.txt",
     output:
-        metrics=temp(out_dir/"ps_metrics/metrics.txt")
+        metrics=temp(out_dir / "ps_metrics/metrics.txt"),
     log:
-        ps=logs/"ps_metrics/ps_metrics.log",
-        console=logs/"ps_metrics/console.log"
-    container: 
+        ps=logs / "ps_metrics/ps_metrics.log",
+        console=logs / "ps_metrics/console.log",
+    container:
         apt_container
     shell:
         """
@@ -57,24 +60,26 @@ rule ps_metrics:
             --metrics-file {output.metrics} \
             --log-file {log.ps} \
             --console-add-neg-select WARNING,summary,debug \
-            > {log.console} 2>&1
+            >{log.console} 2>&1
         """
+
 
 # Run SNPolisher ps-classification
 rule ps_classification:
     """
     Runs SNPolisher to classify SNPs using performance metrics and an annotation file.
+
     """
     input:
-        metrics=out_dir/"ps_metrics/metrics.txt",
-        ps2snp_file=config['refs']['apt']['ps2snp']
+        metrics=out_dir / "ps_metrics/metrics.txt",
+        ps2snp_file=config["refs"]["apt"]["ps2snp"],
     output:
-        recommended=temp(out_dir/"ps_classification/Recommended.ps"),
-        class_dir=temp(directory(out_dir/"ps_classification/"))
+        recommended=temp(out_dir / "ps_classification/Recommended.ps"),
+        class_dir=temp(directory(out_dir / "ps_classification/")),
     log:
-        ps=logs/"ps_classification/ps_classification.log",
-        console=logs/"ps_classification/console.log"
-    container: 
+        ps=logs / "ps_classification/ps_classification.log",
+        console=logs / "ps_classification/console.log",
+    container:
         apt_container
     shell:
         """
@@ -84,26 +89,28 @@ rule ps_classification:
             --ps2snp-file {input.ps2snp_file} \
             --log-file {log.ps} \
             --console-add-neg-select WARNING,summary,debug \
-            > {log.console} 2>&1
+            >{log.console} 2>&1
         """
+
 
 # Run SNPolisher otv-caller
 rule otv_caller:
     """
     Runs SNPolisher to call Off-Target Variants (OTVs) using the recommended SNPs and output from APT.
+
     """
     input:
         rules.apt.output,
-        recommended=out_dir/"ps_classification/Recommended.ps",
-        axiom_dir=out_dir/"apt/",
-        class_dir=out_dir/"ps_classification/"
+        recommended=out_dir / "ps_classification/Recommended.ps",
+        axiom_dir=out_dir / "apt/",
+        class_dir=out_dir / "ps_classification/",
     output:
-        keep=temp(out_dir/"otv_caller/OTV.keep.ps"),
-        otv_dir=temp(directory(out_dir/"otv_caller/"))
+        keep=temp(out_dir / "otv_caller/OTV.keep.ps"),
+        otv_dir=temp(directory(out_dir / "otv_caller/")),
     log:
-        otv=logs/"otv_caller/otv_caller.log",
-        console=logs/"otv_caller/console.log"
-    container: 
+        otv=logs / "otv_caller/otv_caller.log",
+        console=logs / "otv_caller/console.log",
+    container:
         apt_container
     shell:
         """
@@ -112,25 +119,27 @@ rule otv_caller:
             --output-dir {output.otv_dir} \
             --log-file {log.otv} \
             --console-add-neg-select WARNING,summary,debug \
-            > {log.console} 2>&1
+            >{log.console} 2>&1
         """
+
 
 rule make_vcf:
     """
     Runs apt-format-result to generate a VCF file from the APT outputs using the SNP annotation file.
+
     """
     input:
-        otv_keep=out_dir/"otv_caller/OTV.keep.ps",
-        otv_dir=out_dir/"otv_caller/",
-        data_dir=out_dir/"apt/AxiomAnalysisSuiteData/",
-        apt_dir=out_dir/"apt",
-        annotation=config['refs']['apt']['annotation']
+        otv_keep=out_dir / "otv_caller/OTV.keep.ps",
+        otv_dir=out_dir / "otv_caller/",
+        data_dir=out_dir / "apt/AxiomAnalysisSuiteData/",
+        apt_dir=out_dir / "apt",
+        annotation=config["refs"]["apt"]["annotation"],
     output:
-        vcf_file=temp(out_dir/"make_vcf/combined.b37.vcf")
+        vcf_file=temp(out_dir / "make_vcf/combined.b37.vcf"),
     log:
-        apt=logs/"make_vcf/apt_format_result.log",
-        console=logs/"make_vcf/console.log"
-    container: 
+        apt=logs / "make_vcf/apt_format_result.log",
+        console=logs / "make_vcf/console.log",
+    container:
         apt_container
     shell:
         """
@@ -142,5 +151,5 @@ rule make_vcf:
             --export-vcf-file {output.vcf_file} \
             --log-file {log.apt} \
             --console-add-neg-select WARNING,summary,debug \
-            > {log.console} 2>&1
+            >{log.console} 2>&1
         """

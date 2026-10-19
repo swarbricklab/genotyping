@@ -2,6 +2,10 @@
 
 [![DOI](https://zenodo.org/badge/881657744.svg)](https://doi.org/10.5281/zenodo.23006334)
 [![CI](https://github.com/swarbricklab/genotyping/actions/workflows/ci.yml/badge.svg)](https://github.com/swarbricklab/genotyping/actions/workflows/ci.yml)
+[![Snakemake](https://img.shields.io/badge/snakemake-%E2%89%A57.32.4-brightgreen.svg)](https://snakemake.github.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Code style: snakefmt](https://img.shields.io/badge/code%20style-snakefmt-000000.svg)](https://github.com/snakemake/snakefmt)
+[![WorkflowHub](https://img.shields.io/badge/WorkflowHub-2320-14b8a6.svg)](https://workflowhub.eu/workflows/2320)
 
 This workflow creates a VCF file based on the SNP microarray data in a set of `.CEL` files.
 This VCF file can be used for demultiplexing 10X scRNA-seq data where multiple samples have been "pooled" and captured together.

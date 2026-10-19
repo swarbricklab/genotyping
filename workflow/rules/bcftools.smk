@@ -74,10 +74,11 @@ rule remove_timestamps:
     container:
         "docker://quay.io/biocontainers/bcftools:1.21--h8b25389_0"
     shell:
+        # Strip the timestamp lines (`; Date=...` and `##fileDate=`) so the VCFs
+        # are byte-reproducible. Inlined rather than a bash function: snakemake's
+        # `{{ }}` escaping of a function body trips shfmt's indentation and makes
+        # `snakefmt --check` non-idempotent.
         """
-        function remove_dates() {{
-                        cat $1 | sed 's/; Date=.*//' | sed '/^##fileDate=/d'
-                    }}
-        remove_dates {input.hg19} | bgzip -c >{output.vcf_hg19}
-        remove_dates {input.hg38} | bgzip -c >{output.vcf_hg38}
+        sed 's/; Date=.*//' {input.hg19} | sed '/^##fileDate=/d' | bgzip -c >{output.vcf_hg19}
+        sed 's/; Date=.*//' {input.hg38} | sed '/^##fileDate=/d' | bgzip -c >{output.vcf_hg38}
         """

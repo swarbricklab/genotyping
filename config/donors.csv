@@ -1,5 +1,5 @@
 donor,cel_files,array_type
-166,test/data/GSM7036154_166.CEL,UKB
-180N,test/data/GSM7036155_180N.CEL,UKB
-IST3323,test/data/GSM7036159_IST3323.CEL,UKB
-MBE0953,test/data/GSM7036160_MBE0953.CEL,UKB
+166,.tests/integration/data/GSM7036154_166.CEL,UKB
+180N,.tests/integration/data/GSM7036155_180N.CEL,UKB
+IST3323,.tests/integration/data/GSM7036159_IST3323.CEL,UKB
+MBE0953,.tests/integration/data/GSM7036160_MBE0953.CEL,UKB

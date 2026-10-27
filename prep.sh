@@ -43,7 +43,7 @@
 #   --array TYPE        Array type. Only UKB is supported (see below).
 #
 # testdata stage:
-#   --testdata-dir DIR  Write the test CEL files here instead of test/data next
+#   --testdata-dir DIR  Write the test CEL files here instead of .tests/integration/data next
 #                       to this script, which is where config/donors.csv points.
 #
 # check stage (preflight):
@@ -375,14 +375,15 @@ EOF
 
 
 prep_testdata() {
-    local manifest="$here/test/data/gse224950.sha256"
+    local manifest="$here/.tests/integration/data/gse224950.sha256"
     [[ -f "$manifest" ]] || die "checksum manifest not found: $manifest"
 
-    # config/donors.csv names these as test/data/*.CEL, relative to the
-    # directory the workflow is run from. For the standalone test that is the
-    # top of this repository, so test/data next to this script is the same
-    # place. Anything else has its own sample sheet and does not want these.
-    [[ -n "$testdata_dir" ]] || testdata_dir="$here/test/data"
+    # config/donors.csv names these as .tests/integration/data/*.CEL, relative
+    # to the directory the workflow is run from. For the standalone test that is
+    # the top of this repository, so .tests/integration/data next to this script
+    # is the same place. Anything else has its own sample sheet and does not want
+    # these.
+    [[ -n "$testdata_dir" ]] || testdata_dir="$here/.tests/integration/data"
 
     mkdir -p "$testdata_dir"
 
@@ -397,7 +398,7 @@ Downloading the test CEL files from GEO series GSE224950 into $testdata_dir
 
 Four hiPSC lines run on the same Axiom UK Biobank array, deposited by the Powell
 lab at the Garvan Institute. About 50 MB of downloads expanding to roughly
-115 MB. See test/data/gse224950.sha256 for the samples and their provenance.
+115 MB. See .tests/integration/data/gse224950.sha256 for the samples and their provenance.
 
 EOF
 

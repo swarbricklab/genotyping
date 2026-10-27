@@ -10,7 +10,7 @@ deps:
   #
   #   ./prep.sh --what testdata
   #
-  # See test/data/gse224950.sha256 for the samples and their provenance.
+  # See .tests/integration/data/gse224950.sha256 for the samples and their provenance.
   donors: config/donors.csv
 
 # Container images
@@ -49,8 +49,8 @@ refs:
 
 # Outputs
 outs:
-  vcf_hg19: "test/results/test.hg19.vcf.gz"
-  vcf_hg38: "test/results/test.hg38.vcf.gz"
-  psam: "test/results/test.psam"
-  id_map: "test/results/id_map.tsv"
+  vcf_hg19: ".tests/integration/results/test.hg19.vcf.gz"
+  vcf_hg38: ".tests/integration/results/test.hg38.vcf.gz"
+  psam: ".tests/integration/results/test.psam"
+  id_map: ".tests/integration/results/id_map.tsv"
   logs: "logs/genotyping"

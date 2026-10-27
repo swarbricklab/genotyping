@@ -1,2 +1,2 @@
 # This dir only holds setup_placeholders.sh; the placeholders it creates live
-# under resources/ and test/results/ and are covered by the repo's .gitignore.
+# under resources/ and .tests/integration/results/ and are covered by the repo's .gitignore.

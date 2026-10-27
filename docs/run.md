@@ -86,8 +86,8 @@ They are fetched from GEO rather than shipped here:
 ```
 ./prep.sh --what testdata
 ```
-About 50 MB of downloads expanding to roughly 115 MB, into `test/data/`, which is where [`config/donors.csv`](../config/donors.csv) points.
-The files are verified against [`test/data/gse224950.sha256`](../test/data/gse224950.sha256), which also records which samples these are and why.
+About 50 MB of downloads expanding to roughly 115 MB, into `.tests/integration/data/`, which is where [`config/donors.csv`](../config/donors.csv) points.
+The files are verified against [`.tests/integration/data/gse224950.sha256`](../.tests/integration/data/gse224950.sha256), which also records which samples these are and why.
 
 APT cannot read gzipped CEL files, so `prep.sh` expands them; GEO serves them gzipped.
 
@@ -141,7 +141,7 @@ To run the workflow standalone against the test dataset, from the top of this re
 ./run_test.sh
 ```
 [`run_test.sh`](../run_test.sh) is the same wrapper as `run_mod.sh` but points at `workflow/Snakefile` and [`config/test.yaml`](../config/test.yaml) in place of the submodule paths, and it too passes on any snakemake options — so `./run_test.sh --dry-run` works.
-Outputs land in `test/results/`.
+Outputs land in `.tests/integration/results/`.
 
 A full run on Gadi took 57 minutes of wall clock for these four samples, of which roughly half was queue wait.
 `otv_caller` is the longest rule at about 22 minutes, followed by `make_vcf` at 6 and `apt` at 3.
